@@ -6,6 +6,8 @@ import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import MainLayout from './MainLayout/MainLayout.jsx';
 import Home from './Components/Home.jsx';
+import 'leaflet/dist/leaflet.css';
+
 
 const router = createBrowserRouter([
   {

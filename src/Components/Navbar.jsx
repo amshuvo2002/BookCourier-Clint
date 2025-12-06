@@ -1,10 +1,11 @@
 import React from "react";
 import ThemeToggle from "./ThemeToggle";
+import logo from "../assets/vecteezy_delivery-and-courier-motorbike-logo-icon_48113296_New1.jpg";
 
 const Navbar = () => {
   return (
     <div>
-      <div className="navbar bg-base-100 shadow-sm">
+      <div className="navbar bg-gray-300 text-black  shadow-sm">
         <div className="navbar-start">
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -29,54 +30,45 @@ const Navbar = () => {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
             >
               <li>
-                <a>Item 1</a>
+                <a>Home</a>
               </li>
               <li>
-                <a>Parent</a>
-                <ul className="p-2">
-                  <li>
-                    <a>Submenu 1</a>
-                  </li>
-                  <li>
-                    <a>Submenu 2</a>
-                  </li>
-                </ul>
+                <a>Books</a>
               </li>
               <li>
-                <a>Item 3</a>
+                <a>Request Delivery</a>
+              </li>
+              <li>
+                <a>Dashboard</a>
               </li>
             </ul>
           </div>
-          <a className="btn btn-ghost text-xl">daisyUI</a>
+          <div className="flex items-center gap-5">
+            <img className="w-16 h-16 rounded-full" src={logo} alt="" />
+            <a className="text-4xl font-bold">BookCourier</a>
+          </div>
         </div>
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">
             <li>
-              <a>Item 1</a>
+              <a>Home</a>
             </li>
             <li>
-              <details>
-                <summary>Parent</summary>
-                <ul className="p-2 bg-base-100 w-40 z-1">
-                  <li>
-                    <a>Submenu 1</a>
-                  </li>
-                  <li>
-                    <a>Submenu 2</a>
-                  </li>
-                </ul>
-              </details>
+              <a>Books</a>
             </li>
             <li>
-              <a>Item 3</a>
+              <a>Request Delivery</a>
+            </li>
+            <li>
+              <a>Dashboard</a>
             </li>
           </ul>
         </div>
         <div>
-            <ThemeToggle></ThemeToggle>
+          <ThemeToggle></ThemeToggle>
         </div>
         <div className="navbar-end">
-          <a className="btn">Button</a>
+          <a className="btn">Login</a>
         </div>
       </div>
     </div>
