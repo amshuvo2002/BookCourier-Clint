@@ -58,17 +58,17 @@ const Profile = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto border p-6 mt-10 rounded-xl shadow">
+    <div className="max-w-md text-black mx-auto border p-6 mt-10 rounded-xl shadow">
       <h2 className="text-2xl font-bold mb-4 text-center">My Profile</h2>
 
       <form onSubmit={handleUpdate} className="flex flex-col gap-4">
-        <div className="flex flex-col items-center">
+        <div className="flex  flex-col items-center">
           <img
             src={photoPreview || "https://i.ibb.co/4pDNDk1/avatar.png"}
             alt="profile"
             className="w-24 h-24 rounded-full border mb-2 object-cover"
           />
-          <input type="file" onChange={handlePhotoChange} className="file-input file-input-bordered w-full" />
+          <input type="file" onChange={handlePhotoChange} className="file-input bg-white file-input-bordered w-full" />
         </div>
 
         <input
@@ -76,7 +76,7 @@ const Profile = () => {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Full Name"
-          className="input input-bordered w-full"
+          className="input bg-white input-bordered w-full"
           required
         />
 

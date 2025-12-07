@@ -9,14 +9,25 @@ import Home from './Components/Home.jsx';
 import 'leaflet/dist/leaflet.css';
 import Books from './Components/Books.jsx';
 import RequestDelivery from './Components/RequestDelivery.jsx';
-import Dashboard from './Components/Dashboard.jsx';
 import Login from './Components/Login.jsx';
 import Register from './Components/Register.jsx';
 import Authprovider from './Context/Authprovider.jsx';
-import MyProflile from './Components/MyProfile.jsx'
+import MyProfile from './Dashboard/MyProfile.jsx'
 import Error from './Components/Error.jsx';
 import BookDetails from './Components/BooksDetails.jsx';
 
+// Dashboard
+import DashboardLayout from './Dashboard/DashboardLayout.jsx';
+import MyOrders from './Dashboard/MyOrders.jsx';
+import Invoices from './Dashboard/Invoice.jsx';
+import AddBook from './Pages/AddBooks.jsx';
+import MyBooks from './Pages/MyBooks.jsx';
+import Orders from './Pages/Orders.jsx';
+import AdminUsers from './Admin/AdminUsers.jsx';
+import AdminOrders from './Admin/AdminOrders.jsx';
+import AdminBooks from './Admin/AdminBooks.jsx';
+import AdminAddBook from './Admin/AdminAddBook.jsx';
+import SiteSettings from './Admin/SiteSetting.jsx';
 
      
 const router = createBrowserRouter([
@@ -25,7 +36,7 @@ const router = createBrowserRouter([
     element: <MainLayout></MainLayout>,
     errorElement: <Error></Error>,
     children: [
-        {
+      {
         path: "/",
         element: <Home></Home>,
       },
@@ -38,10 +49,6 @@ const router = createBrowserRouter([
         element: <RequestDelivery></RequestDelivery>
       },
       {
-        path:"/Dashboard",
-        element: <Dashboard></Dashboard> 
-      },
-      {
         path:"/Login",
         element: <Login></Login>
       },
@@ -50,20 +57,49 @@ const router = createBrowserRouter([
         element: <Register></Register>
       },
       {
-        path: "/My-Profile",
-        element: <MyProflile></MyProflile>
+        path: "/Books/:id",
+        element: <BookDetails></BookDetails>
       },
-      {
-       path: "/Books/:id",
-       element: <BookDetails></BookDetails>
-      }
-      
- 
-      
-
-
     ]
   },
+
+  // ⭐⭐⭐ Dashboard Routes here ⭐⭐⭐
+ {
+  path: "/dashboard",
+  element: <DashboardLayout></DashboardLayout>,
+  children: [
+    // User
+    { path: "my-orders", element: <MyOrders /> },
+    { path: "profile", element: <MyProfile /> },
+    { path: "invoices", element: <Invoices /> },
+
+    // ⭐ Librarian
+    { path: "add-book", element: <AddBook /> },
+    { path: "my-books", element: <MyBooks /> },
+    { path: "orders", element: <Orders /> },
+    // Admin
+      {
+        path: "users",
+        element: <AdminUsers></AdminUsers>
+      },
+      {
+        path: "orders",
+        element: <AdminOrders></AdminOrders>
+      },
+      {
+        path: "books",
+        element: <AdminBooks></AdminBooks>
+      },
+      {
+        path: "add-book",
+        element: <AdminAddBook></AdminAddBook>
+      },
+      {
+        path: "settings",
+        element: <SiteSettings></SiteSettings>
+      },
+  ]
+},
 ]);
 
 createRoot(document.getElementById('root')).render(

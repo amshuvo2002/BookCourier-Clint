@@ -207,7 +207,7 @@ const Home = () => {
 
       {/* Extra Section 2 */}
       <div
-        className="py-5 flex gap-5  flex-row-reverse justify-center items-center text-center max-w-6xl mx-auto px-10 bg-blue-50 r"
+        className="py-5 flex gap-5 mb-10  flex-row-reverse justify-center items-center text-center max-w-6xl mx-auto px-10 bg-blue-50 r"
         data-aos="fade-up"
       >
        <div >
