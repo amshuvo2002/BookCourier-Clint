@@ -27,41 +27,22 @@ const Home = () => {
   const bannerSlides = [
     {
       id: 1,
-      title: "Fast & Safe Book Delivery",
+       title: "Read Anywhere, Anytime",
       description:
         "Delivering books to your doorstep with care, across all major cities.",
-      img: "https://i.ibb.co.com/pWWLM3m/book3.jpg",
+      img: "https://images.unsplash.com/photo-1610116306796-6fea9f4fae38?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Ym9va3N8ZW58MHx8MHx8fDA%3D",
     },
     {
       id: 2,
-      title: "Read Anywhere, Anytime",
+      title: "Fast & Safe Book Delivery",
       description: "Your favorite books are just one click away.",
-      img: "https://i.ibb.co.com/r2Sc0pw/library-banner-2.jpg",
+      img: "https://media.istockphoto.com/id/511661096/photo/woman-hand-accepting-a-delivery-of-boxes-from-deliveryman.jpg?s=612x612&w=0&k=20&c=m6e7vtu_UJ97nM50VkIBtAvNnSt76ndRv4-MrVYVkns=",
     },
     {
       id: 3,
       title: "Smart Library Delivery System",
       description: "BookCourier makes reading easier and smarter.",
-      img: "https://i.ibb.co.com/8Nrk7Lz/library-banner-3.jpg",
-    },
-    {
-      id: 4,
-      title: "Join Our Book Community",
-      description: "Connect with fellow readers and share your love for books.",
-      img: "https://i.ibb.co.com/pWWLM3m/book3.jpg",
-    },
-    {
-      id: 5,
-      title: "Weekly Book Offers",
-      description: "Grab exciting discounts on top books every week.",
-      img: "https://i.ibb.co.com/r2Sc0pw/library-banner-2.jpg",
-    },
-    {
-      id: 6,
-      title: "Library-To-Home Service",
-      description:
-        "Get books from your library delivered directly to your home.",
-      img: "https://i.ibb.co.com/8Nrk7Lz/library-banner-3.jpg",
+      img: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y291cmllcnxlbnwwfHwwfHx8MA%3D%3D",
     },
   ];
 
@@ -96,7 +77,7 @@ const Home = () => {
           {bannerSlides.map((slide) => (
             <div key={slide.id}>
               <div
-                className="h-[400px] md:h-[500px] bg-cover bg-center rounded-xl flex flex-col items-center justify-center text-white px-6"
+                className="h-[400px] md:h-[500px] bg-cover bg-center flex flex-col items-center justify-center text-white px-6"
                 style={{ backgroundImage: `url(${slide.img})` }}
               >
                 <h2 className="text-4xl md:text-5xl font-bold drop-shadow-lg">
@@ -117,7 +98,7 @@ const Home = () => {
       {/* Latest Books Section */}
       <div className="max-w-6xl mx-auto px-4">
         <h2
-          className="text-3xl font-bold mb-8 text-center text-black"
+          className="text-3xl font-bold mb-8 text-center"
           data-aos="fade-up"
         >
           Latest Books
@@ -126,14 +107,14 @@ const Home = () => {
           {latestBooks.map((book, idx) => (
             <div
               key={book.id}
-              className="p-4 bg-white rounded-xl shadow-lg transform transition duration-500 hover:scale-105"
+              className="p-4 bg-white shadow-lg transform transition duration-500 hover:scale-105"
               data-aos="fade-up"
               data-aos-delay={`${idx * 200}`}
             >
               <img
                 src={book.img}
                 alt={book.title}
-                className="w-full h-56 object-cover rounded-lg"
+                className="w-full h-56 object-cover"
               />
               <h3 className="mt-4 text-xl font-semibold text-center text-black">
                 {book.title}
@@ -144,14 +125,14 @@ const Home = () => {
       </div>
 
       {/* Coverage Section */}
-      <div className="bg-gray-100 py-10" data-aos="fade-right">
+      <div className="bg-gray-100 m-10 py-10" data-aos="fade-right">
         <div>
           {" "}
           <h2 className="text-3xl font-bold text-center mb-5 text-black">
             Service Coverage
           </h2>
         </div>
-        <div className="px-20">
+        <div className="md:px-20">
           <BangladeshMap></BangladeshMap>
         </div>
       </div>
@@ -159,7 +140,7 @@ const Home = () => {
       {/* Why Choose BookCourier */}
       <div className="max-w-6xl mx-auto py-20 px-4">
         <h2
-          className="text-3xl font-bold text-center mb-12 text-black"
+          className="text-3xl font-bold text-center mb-12 "
           data-aos="fade-up"
         >
           Why Choose BookCourier?
@@ -174,7 +155,7 @@ const Home = () => {
             {
               icon: <FaMapMarkerAlt size={40} />,
               title: "Wide Coverage",
-              text: "Delivering in 50+ major cities.",
+              text: "Delivering in 10+ major cities.",
             },
             {
               icon: <FaClock size={40} />,
@@ -189,14 +170,14 @@ const Home = () => {
           ].map((item, idx) => (
             <div
               key={idx}
-              className="p-6 bg-white rounded-xl text-center shadow-lg"
+              className="p-6 bg-gray-100 text-black rounded-xl text-center shadow-lg"
               data-aos="zoom-in"
               data-aos-delay={`${idx * 200}`}
             >
               <div className="flex justify-center mb-4 text-blue-600">
                 {item.icon}
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-black">
+              <h3 className="text-xl font-semibold mb-2 ">
                 {item.title}
               </h3>
               <p>{item.text}</p>
@@ -207,30 +188,40 @@ const Home = () => {
 
       {/* Extra Section 1 */}
       <div
-        className="bg-blue-50 py-20 text-center rounded-xl max-w-6xl mx-auto px-4"
+        className="bg-blue-50 flex justify-center items-center px-10 py-5 text-center max-w-6xl mx-auto"
         data-aos="fade-up"
       >
-        <h2 className="text-3xl font-bold mb-4 text-black">
+       <div>
+         <h2 className="text-3xl font-bold mb-4 text-black">
           Join Our Reading Community
         </h2>
         <p className="text-lg max-w-2xl mx-auto text-gray-700">
           Discover new books, share your reviews, and connect with fellow
           readers across Bangladesh.
         </p>
+       </div>
+       <div>
+        <img className="shadow-2xl" src="https://img.freepik.com/free-photo/high-angle-people-reading-together_23-2150062128.jpg?semt=ais_se_enriched&w=740&q=80" alt="" />
+       </div>
       </div>
 
       {/* Extra Section 2 */}
       <div
-        className="py-20 text-center max-w-6xl mx-auto px-4 bg-blue-50 rounded-xl"
+        className="py-5 flex gap-5  flex-row-reverse justify-center items-center text-center max-w-6xl mx-auto px-10 bg-blue-50 r"
         data-aos="fade-up"
       >
-        <h2 className="text-3xl font-bold mb-4 text-black">
+       <div >
+         <h2 className="text-3xl font-bold mb-4 text-black">
           Special Weekly Offers
         </h2>
         <p className="text-lg max-w-2xl mx-auto text-gray-700">
           Get exciting discounts every week on top-selling books. Stay tuned and
           grab your favorite books now!
         </p>
+       </div>
+       <div>
+        <img className="shadow-2xl" src="https://thumbs.dreamstime.com/b/exclusive-special-offer-logo-illustration-389557948.jpg" alt="" />
+       </div>
       </div>
     </div>
   );
