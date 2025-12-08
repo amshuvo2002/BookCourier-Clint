@@ -15,6 +15,11 @@ const Authprovider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true); // new: track loading
 
+
+  const signIn = (email, password) => {
+    return signInWithEmailAndPassword(auth, email, password);
+  };
+
   // user state update automatically
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -38,6 +43,7 @@ const Authprovider = ({ children }) => {
     const provider = new GoogleAuthProvider(); 
     const result = await signInWithPopup(auth, provider); 
     setUser(result.user); 
+    return result; 
   };
 
   const logout = async () => { 
@@ -46,7 +52,7 @@ const Authprovider = ({ children }) => {
   };
 
   return (
-    <Authcontext.Provider value={{ user, register, login, setUser, googleLogin, logout, loading }}>
+    <Authcontext.Provider value={{ user, signIn,  register, login, setUser, googleLogin, logout, loading }}>
       {children}
     </Authcontext.Provider>
   );

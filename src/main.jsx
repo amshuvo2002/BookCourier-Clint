@@ -30,6 +30,9 @@ import AdminAddBook from './Admin/AdminAddBook.jsx';
 import SiteSettings from './Admin/SiteSetting.jsx';
 import SalesChart from './Pages/SalesChart.jsx';
 import PrivateRoute from './PrivetRouts/PrivetRoute.jsx';
+import UserRoute from './PrivetRouts/UserRoute.jsx';
+import LibrarianRoute from './PrivetRouts/LibrarianRoute.jsx';
+import AdminRoute from './PrivetRouts/AdminRoute.jsx';
 
      
 const router = createBrowserRouter([
@@ -65,47 +68,31 @@ const router = createBrowserRouter([
     ]
   },
 
-  // ⭐⭐⭐ Dashboard Routes here ⭐⭐⭐
- {
+{
   path: "/dashboard",
-  element: <PrivateRoute><DashboardLayout></DashboardLayout></PrivateRoute>,
+  element: <PrivateRoute><DashboardLayout /></PrivateRoute>,
   children: [
+    {path: "monthlySales", element: <SalesChart></SalesChart>},
     // User
-    { path: "my-orders", element: <MyOrders /> },
-    { path: "profile", element: <MyProfile /> },
-    { path: "invoices", element: <Invoices /> },
+    { path: "my-orders", element: <UserRoute> <MyOrders /> </UserRoute>  },
+    { path: "profile", element: <UserRoute> <MyProfile /> </UserRoute> },
+    { path: "invoices", element: <UserRoute> <Invoices /> </UserRoute> },
 
-    // ⭐ Librarian
-    { path: "add-book", element: <AddBook /> },
-    { path: "my-books", element: <MyBooks /> },
-    { path: "orders", element: <Orders /> },
+    // Librarian
+    { path: "add-book", element: <LibrarianRoute><AddBook /></LibrarianRoute> },
+    { path: "my-books", element: <LibrarianRoute><MyBooks /></LibrarianRoute>},
+    { path: "orders", element: <LibrarianRoute><Orders /></LibrarianRoute> },
+
     // Admin
-      {
-        path: "users",
-        element: <AdminUsers></AdminUsers>
-      },
-      {
-        path: "orders",
-        element: <AdminOrders></AdminOrders>
-      },
-      {
-        path: "books",
-        element: <AdminBooks></AdminBooks>
-      },
-      {
-        path: "add-book",
-        element: <AdminAddBook></AdminAddBook>
-      },
-      {
-        path: "settings",
-        element: <SiteSettings></SiteSettings>
-      },
-      {
-        path:"monthlySales",
-        element: <SalesChart></SalesChart>
-      }
+    { path: "users", element: <AdminRoute><AdminUsers /></AdminRoute> },
+    { path: "orders", element: <AdminRoute><AdminOrders /></AdminRoute> },
+    { path: "books", element: <AdminRoute><AdminBooks /></AdminRoute> },
+    { path: "add-book", element: <AdminRoute><AdminAddBook /></AdminRoute>},
+    { path: "settings", element: <AdminRoute><SiteSettings /></AdminRoute>},
+    { path: "monthlySales", element: <AdminRoute><SalesChart /></AdminRoute> },
   ]
-},
+}
+
 ]);
 
 createRoot(document.getElementById('root')).render(

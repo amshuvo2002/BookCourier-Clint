@@ -3,8 +3,10 @@ import { Authcontext } from "../Context/Authcontext";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
 import Swal from "sweetalert2";
-import { updateProfile, GoogleAuthProvider, } from "firebase/auth";
+import { updateProfile, GoogleAuthProvider } from "firebase/auth";
 import { FcGoogle } from "react-icons/fc";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../Firebase/Firebase.init";
 
 export default function Register() {
   const [showPass, setShowPass] = useState(false);
@@ -12,24 +14,41 @@ export default function Register() {
   const navigate = useNavigate();
   const googleProvider = new GoogleAuthProvider();
 
-  // 🔹 Google Login Handler
   const handleGoogleLogin = async () => {
-    try {
-      await googleLogin(); // context update inside
-      Swal.fire({
-        icon: "success",
-        title: "Google Login Successful!",
-        text: `Welcome!`,
-      });
-      navigate("/");
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Google Login Failed!",
-        text: err.message,
+  try {
+    const result = await googleLogin();
+    const user = result.user;
+
+    // Firestore check
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      // save new google user
+      await setDoc(userRef, {
+        name: user.displayName,
+        email: user.email,
+        role: "user",
+        photoURL: user.photoURL,
       });
     }
-  };
+
+    Swal.fire({
+      icon: "success",
+      title: "Google Login Successful!",
+      text: `Welcome!`,
+    });
+
+    navigate("/");
+  } catch (err) {
+    Swal.fire({
+      icon: "error",
+      title: "Google Login Failed!",
+      text: err.message,
+    });
+  }
+};
+
 
   // 🔹 Main Register Handler
   const handleRegister = async (e) => {
@@ -57,6 +76,14 @@ export default function Register() {
 
       // Update Firebase profile
       await updateProfile(user, { displayName: name, photoURL });
+
+      // Save user data in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name,
+        email,
+        role: "user", // default role
+        photoURL,
+      });
 
       // ✅ Update context instantly
       setUser({ ...user, displayName: name, photoURL });
