@@ -28,6 +28,8 @@ import AdminOrders from './Admin/AdminOrders.jsx';
 import AdminBooks from './Admin/AdminBooks.jsx';
 import AdminAddBook from './Admin/AdminAddBook.jsx';
 import SiteSettings from './Admin/SiteSetting.jsx';
+import SalesChart from './Pages/SalesChart.jsx';
+import PrivateRoute from './PrivetRouts/PrivetRoute.jsx';
 
      
 const router = createBrowserRouter([
@@ -46,7 +48,7 @@ const router = createBrowserRouter([
       },
       {
         path:"/Request-Delivery",
-        element: <RequestDelivery></RequestDelivery>
+        element: <PrivateRoute><RequestDelivery></RequestDelivery></PrivateRoute>
       },
       {
         path:"/Login",
@@ -66,7 +68,7 @@ const router = createBrowserRouter([
   // ⭐⭐⭐ Dashboard Routes here ⭐⭐⭐
  {
   path: "/dashboard",
-  element: <DashboardLayout></DashboardLayout>,
+  element: <PrivateRoute><DashboardLayout></DashboardLayout></PrivateRoute>,
   children: [
     // User
     { path: "my-orders", element: <MyOrders /> },
@@ -98,6 +100,10 @@ const router = createBrowserRouter([
         path: "settings",
         element: <SiteSettings></SiteSettings>
       },
+      {
+        path:"monthlySales",
+        element: <SalesChart></SalesChart>
+      }
   ]
 },
 ]);

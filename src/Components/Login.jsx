@@ -1,16 +1,18 @@
 import { useState, useContext } from "react";
-import { Authcontext } from "../Context/Authcontext"; // path adjust করুন
+import { Authcontext } from "../Context/Authcontext"; 
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import Swal from "sweetalert2";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../Firebase/Firebase.init"; // Firebase auth import
+import { auth } from "../Firebase/Firebase.init"; 
 import { FcGoogle } from "react-icons/fc";
 
 export default function Login() {
   const [showPass, setShowPass] = useState(false);
   const { signIn } = useContext(Authcontext);
   const navigate = useNavigate();
+  const location = useLocation();  // ⭐ added
+  const from = location.state?.from?.pathname || "/"; // ⭐ added
 
   const googleProvider = new GoogleAuthProvider();
 
@@ -23,7 +25,7 @@ export default function Login() {
         title: "Google Login Successful!",
         text: "Welcome back!",
       });
-      navigate("/"); // login successful হলে home page এ নিয়ে যাবে
+      navigate(from, { replace: true }); // ⭐ redirect back
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -46,7 +48,7 @@ export default function Login() {
         title: "Login Successful!",
         text: "Welcome back!",
       });
-      navigate("/");
+      navigate(from, { replace: true }); // ⭐ redirect back
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -57,11 +59,10 @@ export default function Login() {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto border p-6 mt-20 rounded-xl">
+    <div className="w-full max-w-sm mx-auto border mb-10 p-6 mt-10 rounded-xl">
       <h2 className="text-xl font-bold mb-4 text-center">Login</h2>
 
       <form onSubmit={handleLogin}>
-        {/* Email */}
         <input
           type="email"
           name="email"
@@ -70,7 +71,6 @@ export default function Login() {
           required
         />
 
-        {/* Password */}
         <div className="relative mb-3">
           <input
             type={showPass ? "text" : "password"}
@@ -87,10 +87,8 @@ export default function Login() {
           </span>
         </div>
 
-        {/* Email Login Button */}
         <button className="btn btn-primary w-full mb-3">Login</button>
 
-        {/* Google Login Button */}
         <button
           type="button"
           onClick={handleGoogleLogin}
@@ -99,7 +97,6 @@ export default function Login() {
           <FcGoogle className="text-2xl" /> Login with Google
         </button>
 
-        {/* Register Link */}
         <p className="text-center mt-4 text-sm">
           Don't have an account?{" "}
           <Link to="/register" className="text-blue-600 font-semibold">

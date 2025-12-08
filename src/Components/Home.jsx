@@ -6,6 +6,7 @@ import { FaMapMarkerAlt, FaTruck, FaClock, FaShieldAlt } from "react-icons/fa";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import BangladeshMap from "./BangladeshMap";
+import { Link } from "react-router";
 
 const Home = () => {
   useEffect(() => {
@@ -86,9 +87,9 @@ const Home = () => {
                 <p className="max-w-xl text-center mt-3 drop-shadow-lg text-lg">
                   {slide.description}
                 </p>
-                <button className="btn btn-primary mt-5 animate-bounce">
+                <Link to={"/Books"}><button className="btn btn-primary mt-5 animate-bounce">
                   All Books
-                </button>
+                </button></Link>
               </div>
             </div>
           ))}
