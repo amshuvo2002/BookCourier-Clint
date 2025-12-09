@@ -38,7 +38,11 @@ export default function DashboardLayout() {
             {/* Sales Chart - Admin only */}
             {user?.role === "admin" && (
               <div>
-                <h3 className={`text-gray-400 mb-1 transition ${isOpen ? "opacity-100" : "opacity-0"}`}>
+                <h3
+                  className={`text-gray-400 mb-1 transition ${
+                    isOpen ? "opacity-100" : "opacity-0"
+                  }`}
+                >
                   Sales Chart
                 </h3>
                 <li>
@@ -54,43 +58,53 @@ export default function DashboardLayout() {
             )}
 
             {/* User Section */}
-            {user?.role === "user" && (
-              <div>
-                <h3 className={`text-gray-400 mb-1 transition ${isOpen ? "opacity-100" : "opacity-0"}`}>
-                  My Dashboard
-                </h3>
-                <li>
-                  <NavLink
-                    to="/dashboard/my-orders"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "My Orders" : "🛒"}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/dashboard/profile"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "My Profile" : <CgProfile />}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/dashboard/invoices"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "Invoices" : "📄"}
-                  </NavLink>
-                </li>
-                <hr className="border-gray-700" />
-              </div>
-            )}
+            <div>
+              <h3
+                className={`text-gray-400 mb-1 transition ${
+                  isOpen ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                My Dashboard
+              </h3>
+
+              <li>
+                <NavLink
+                  to="/dashboard/my-orders"
+                  className="block hover:bg-gray-800 p-2 rounded-lg"
+                >
+                  {isOpen ? "My Orders" : "🛒"}
+                </NavLink>
+              </li>
+
+              <li>
+                <NavLink
+                  to="/dashboard/profile"
+                  className="block hover:bg-gray-800 p-2 rounded-lg"
+                >
+                  {isOpen ? "My Profile" : <CgProfile />}
+                </NavLink>
+              </li>
+
+              <li>
+                <NavLink
+                  to="/dashboard/invoices"
+                  className="block hover:bg-gray-800 p-2 rounded-lg"
+                >
+                  {isOpen ? "Invoices" : "📄"}
+                </NavLink>
+              </li>
+
+              <hr className="border-gray-700" />
+            </div>
 
             {/* Librarian Section */}
             {user?.role === "librarian" && (
               <div>
-                <h3 className={`text-gray-400 mb-1 transition ${isOpen ? "opacity-100" : "opacity-0"}`}>
+                <h3
+                  className={`text-gray-400 mb-1 transition ${
+                    isOpen ? "opacity-100" : "opacity-0"
+                  }`}
+                >
                   Librarian Panel
                 </h3>
                 <li>
@@ -124,31 +138,50 @@ export default function DashboardLayout() {
             {/* Admin Section */}
             {user?.role === "admin" && (
               <div>
-                <h3 className={`text-gray-400 mb-1 transition ${isOpen ? "opacity-100" : "opacity-0"}`}>
+                <h3
+                  className={`text-gray-400 mb-1 transition ${
+                    isOpen ? "opacity-100" : "opacity-0"
+                  }`}
+                >
                   Admin Panel
                 </h3>
                 <li>
-                  <NavLink to="/dashboard/users" className="block hover:bg-gray-800 p-2 rounded-lg">
+                  <NavLink
+                    to="/dashboard/users"
+                    className="block hover:bg-gray-800 p-2 rounded-lg"
+                  >
                     {isOpen ? "All Users" : "👥"}
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/dashboard/orders" className="block hover:bg-gray-800 p-2 rounded-lg">
+                  <NavLink
+                    to="/dashboard/orders"
+                    className="block hover:bg-gray-800 p-2 rounded-lg"
+                  >
                     {isOpen ? "All Orders" : "🧾"}
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/dashboard/books" className="block hover:bg-gray-800 p-2 rounded-lg">
+                  <NavLink
+                    to="/dashboard/books"
+                    className="block hover:bg-gray-800 p-2 rounded-lg"
+                  >
                     {isOpen ? "Manage Books" : "📚"}
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/dashboard/add-book" className="block hover:bg-gray-800 p-2 rounded-lg">
+                  <NavLink
+                    to="/dashboard/add-book"
+                    className="block hover:bg-gray-800 p-2 rounded-lg"
+                  >
                     {isOpen ? "Add Books" : "➕"}
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/dashboard/settings" className="block hover:bg-gray-800 p-2 rounded-lg">
+                  <NavLink
+                    to="/dashboard/settings"
+                    className="block hover:bg-gray-800 p-2 rounded-lg"
+                  >
                     {isOpen ? "Settings" : "⚙️"}
                   </NavLink>
                 </li>

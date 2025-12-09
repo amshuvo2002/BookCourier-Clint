@@ -3,7 +3,7 @@ import { Authcontext } from "../Context/Authcontext";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router";
 import Swal from "sweetalert2";
-import { updateProfile, GoogleAuthProvider } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
 import { FcGoogle } from "react-icons/fc";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../Firebase/Firebase.init";
@@ -12,45 +12,46 @@ export default function Register() {
   const [showPass, setShowPass] = useState(false);
   const { register, googleLogin, setUser } = useContext(Authcontext);
   const navigate = useNavigate();
-  const googleProvider = new GoogleAuthProvider();
 
+  // Google Login
   const handleGoogleLogin = async () => {
-  try {
-    const result = await googleLogin();
-    const user = result.user;
+    try {
+      const result = await googleLogin();
+      const user = result.user;
 
-    // Firestore check
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
 
-    if (!userSnap.exists()) {
-      // save new google user
-      await setDoc(userRef, {
-        name: user.displayName,
-        email: user.email,
-        role: "user",
-        photoURL: user.photoURL,
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          name: user.displayName,
+          email: user.email,
+          role: "user",
+          photoURL: user.photoURL,
+        });
+      }
+
+      // SweetAlert
+      await Swal.fire({
+        icon: "success",
+        title: "Google Login Successful!",
+        text: "Welcome back!",
+        timer: 2000,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+
+      navigate("/");
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Google Login Failed!",
+        text: err.message,
       });
     }
+  };
 
-    Swal.fire({
-      icon: "success",
-      title: "Google Login Successful!",
-      text: `Welcome!`,
-    });
-
-    navigate("/");
-  } catch (err) {
-    Swal.fire({
-      icon: "error",
-      title: "Google Login Failed!",
-      text: err.message,
-    });
-  }
-};
-
-
-  // 🔹 Main Register Handler
+  // Main Register Handler
   const handleRegister = async (e) => {
     e.preventDefault();
     const name = e.target.name.value;
@@ -63,7 +64,8 @@ export default function Register() {
       return Swal.fire({
         icon: "warning",
         title: "Weak Password!",
-        text: "Password must be 6 chars with 1 uppercase & 1 number.",
+        text: "Password must be 6+ chars with 1 uppercase & 1 number.",
+        confirmButtonText: "OK",
       });
     }
 
@@ -71,42 +73,47 @@ export default function Register() {
       const userCredential = await register(email, password, name, image);
       const user = userCredential.user;
 
-      // Image URL
-      let photoURL = image ? URL.createObjectURL(image) : "";
+      // Fixed photoURL
+      const photoURL = image ? URL.createObjectURL(image) : "";
 
       // Update Firebase profile
       await updateProfile(user, { displayName: name, photoURL });
 
-      // Save user data in Firestore
+      // Save user in Firestore
       await setDoc(doc(db, "users", user.uid), {
         name,
         email,
-        role: "user", // default role
+        role: "user",
         photoURL,
       });
 
-      // ✅ Update context instantly
+      // Update context
       setUser({ ...user, displayName: name, photoURL });
 
-      Swal.fire({
+      // SweetAlert
+      await Swal.fire({
         icon: "success",
         title: "Registration Successful!",
-        text: `Welcome, ${name}`,
+        text: `Welcome, ${name}!`,
+        timer: 2000,
+        showConfirmButton: false,
+        timerProgressBar: true,
       });
 
-      navigate("/"); // redirect to home
+      navigate("/"); // Navigate after alert
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "Registration Failed!",
         text: err.message,
+        confirmButtonText: "Try Again",
       });
     }
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto border mb-10 p-6 mt-10 rounded-xl">
-      <h2 className="text-xl font-bold mb-4 text-center">Register</h2>
+    <div className="w-full max-w-sm mx-auto border mb-10 p-6 mt-10 rounded-xl shadow-lg">
+      <h2 className="text-2xl font-bold mb-6 text-center text-primary">Register</h2>
 
       <form onSubmit={handleRegister}>
         <input
@@ -116,7 +123,6 @@ export default function Register() {
           className="input input-bordered w-full mb-3"
           required
         />
-
         <input
           type="email"
           name="email"
@@ -124,7 +130,6 @@ export default function Register() {
           className="input input-bordered w-full mb-3"
           required
         />
-
         <input
           type="file"
           name="image"
@@ -132,7 +137,7 @@ export default function Register() {
           className="file-input file-input-bordered w-full mb-3"
         />
 
-        <div className="relative mb-3">
+        <div className="relative mb-4">
           <input
             type={showPass ? "text" : "password"}
             name="password"
@@ -142,25 +147,27 @@ export default function Register() {
           />
           <span
             onClick={() => setShowPass(!showPass)}
-            className="absolute right-3 top-3 cursor-pointer text-xl"
+            className="absolute right-3 top-3 cursor-pointer text-xl text-gray-500"
           >
             {showPass ? <FiEyeOff /> : <FiEye />}
           </span>
         </div>
 
-        <button className="btn btn-primary w-full mb-3">Register</button>
+        <button type="submit" className="btn btn-primary w-full mb-3">
+          Register
+        </button>
 
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className="btn w-full flex items-center justify-center gap-2 mt-2"
+          className="btn btn-outline w-full flex items-center justify-center gap-2"
         >
           <FcGoogle className="text-2xl" /> Continue with Google
         </button>
 
-        <p className="text-center mt-4 text-sm">
+        <p className="text-center mt-6 text-sm">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 font-semibold">
+          <Link to="/login" className="text-primary font-semibold hover:underline">
             Login
           </Link>
         </p>

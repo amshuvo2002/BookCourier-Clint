@@ -63,7 +63,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/Books/:id",
-        element: <BookDetails></BookDetails>
+        element: <PrivateRoute><BookDetails></BookDetails></PrivateRoute>
       },
     ]
   },
@@ -74,9 +74,9 @@ const router = createBrowserRouter([
   children: [
     {path: "monthlySales", element: <SalesChart></SalesChart>},
     // User
-    { path: "my-orders", element: <UserRoute> <MyOrders /> </UserRoute>  },
-    { path: "profile", element: <UserRoute> <MyProfile /> </UserRoute> },
-    { path: "invoices", element: <UserRoute> <Invoices /> </UserRoute> },
+    { path: "my-orders", element: <MyOrders />   },
+    { path: "profile", element:  <MyProfile /> },
+    { path: "invoices", element:  <Invoices /> },
 
     // Librarian
     { path: "add-book", element: <LibrarianRoute><AddBook /></LibrarianRoute> },

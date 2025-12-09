@@ -28,7 +28,7 @@ const Navbar = () => {
             <Link to={"/"}><h1 className="hover:underline">Home</h1></Link>
             <Link to={"/Books"}><h1 className="hover:underline">Books</h1></Link>
             <Link to={"/Request-Delivery"}><h1 className="hover:underline">Request Delivery</h1></Link>
-            <Link to={"/Dashboard/monthlySales"}><h1 className="hover:underline">Dashboard</h1></Link>
+            <Link to={"/Dashboard/my-orders"}><h1 className="hover:underline">Dashboard</h1></Link>
           </ul>
         </div>
 
@@ -43,7 +43,7 @@ const Navbar = () => {
           <Link to={"/"}><h1 className="hover:underline">Home</h1></Link>
           <Link to={"/Books"}><h1 className="hover:underline">Books</h1></Link>
           <Link to={"/Request-Delivery"}><h1 className="hover:underline">Request Delivery</h1></Link>
-          <Link to={"/Dashboard/monthlySales"}><h1 className="hover:underline">Dashboard</h1></Link>
+          <Link to={"/Dashboard/my-orders"}><h1 className="hover:underline">Dashboard</h1></Link>
         </ul>
       </div>
 

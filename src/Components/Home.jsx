@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -7,10 +7,27 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import BangladeshMap from "./BangladeshMap";
 import { Link } from "react-router";
+import UseAxious from "../Hooks/UseAxious";
 
 const Home = () => {
+  const [latestBooks, setLatestBooks] = useState([]);
+  const axiosSecure = UseAxious();
+
   useEffect(() => {
     AOS.init({ duration: 1000, once: true, easing: "ease-in-out" });
+
+    // ---- Fetch Latest 4 Books ----
+    const fetchBooks = async () => {
+      try {
+        const res = await axiosSecure.get("/books"); 
+        const data = res.data.reverse().slice(0, 4); // last 4 books
+        setLatestBooks(data);
+      } catch (err) {
+        console.error("Error fetching books:", err);
+      }
+    };
+
+    fetchBooks();
   }, []);
 
   const sliderSettings = {
@@ -28,50 +45,28 @@ const Home = () => {
   const bannerSlides = [
     {
       id: 1,
-       title: "Read Anywhere, Anytime",
+      title: "Read Anywhere, Anytime",
       description:
         "Delivering books to your doorstep with care, across all major cities.",
-      img: "https://images.unsplash.com/photo-1610116306796-6fea9f4fae38?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Ym9va3N8ZW58MHx8MHx8fDA%3D",
+      img: "https://images.unsplash.com/photo-1610116306796-6fea9f4fae38?w=600&auto=format&fit=crop&q=60",
     },
     {
       id: 2,
       title: "Fast & Safe Book Delivery",
       description: "Your favorite books are just one click away.",
-      img: "https://media.istockphoto.com/id/511661096/photo/woman-hand-accepting-a-delivery-of-boxes-from-deliveryman.jpg?s=612x612&w=0&k=20&c=m6e7vtu_UJ97nM50VkIBtAvNnSt76ndRv4-MrVYVkns=",
+      img: "https://static.vecteezy.com/system/resources/thumbnails/050/897/100/small/delivery-person-handing-a-cardboard-package-to-another-person-indoor-environment-photo.jpeg",
     },
     {
       id: 3,
       title: "Smart Library Delivery System",
       description: "BookCourier makes reading easier and smarter.",
-      img: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y291cmllcnxlbnwwfHwwfHx8MA%3D%3D",
-    },
-  ];
-
-  const latestBooks = [
-    {
-      id: 1,
-      title: "The Silent Echo",
-      img: "https://i.ibb.co.com/pWWLM3m/book3.jpg",
-    },
-    {
-      id: 2,
-      title: "Whispers of Time",
-      img: "https://i.ibb.co.com/L8LXxr1/book2.jpg",
-    },
-    {
-      id: 3,
-      title: "Winds of Destiny",
-      img: "https://i.ibb.co.com/QHYfJ0f/book1.jpg",
-    },
-    {
-      id: 4,
-      title: "Journey Beyond",
-      img: "https://i.ibb.co.com/pWWLM3m/book3.jpg",
+      img: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?fm=jpg&q=60&w=3000",
     },
   ];
 
   return (
     <div className="space-y-24">
+
       {/* Banner Section */}
       <div className="max-w-6xl mx-auto mt-10" data-aos="fade-up">
         <Slider {...sliderSettings}>
@@ -87,65 +82,61 @@ const Home = () => {
                 <p className="max-w-xl text-center mt-3 drop-shadow-lg text-lg">
                   {slide.description}
                 </p>
-                <Link to={"/Books"}><button className="btn btn-primary mt-5 animate-bounce">
-                  All Books
-                </button></Link>
+                <Link to={"/Books"}>
+                  <button className="btn btn-primary mt-5 animate-bounce">
+                    All Books
+                  </button>
+                </Link>
               </div>
             </div>
           ))}
         </Slider>
       </div>
 
-      {/* Latest Books Section */}
+      {/* Latest Books Section (Dynamic) */}
       <div className="max-w-6xl mx-auto px-4">
-        <h2
-          className="text-3xl font-bold mb-8 text-center"
-          data-aos="fade-up"
-        >
+        <h2 className="text-3xl font-bold mb-8 text-center" data-aos="fade-up">
           Latest Books
         </h2>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {latestBooks.map((book, idx) => (
-            <div
-              key={book.id}
-              className="p-4 bg-white shadow-lg transform transition duration-500 hover:scale-105"
-              data-aos="fade-up"
-              data-aos-delay={`${idx * 200}`}
-            >
-              <img
-                src={book.img}
-                alt={book.title}
-                className="w-full h-56 object-cover"
-              />
-              <h3 className="mt-4 text-xl font-semibold text-center text-black">
-                {book.title}
-              </h3>
-            </div>
+            <Link to={`/Books/${book._id}`} key={book._id}>
+              <div
+                className="p-4 bg-white shadow-lg transform transition duration-500 hover:scale-105"
+                data-aos="fade-up"
+                data-aos-delay={`${idx * 200}`}
+              >
+                <img
+                  src={book.img}
+                  alt={book.title}
+                  className="w-full h-56 object-cover"
+                />
+                <h3 className="mt-4 text-xl font-semibold text-center text-black">
+                  {book.title}
+                </h3>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
 
       {/* Coverage Section */}
       <div className="bg-gray-100 m-10 py-10" data-aos="fade-right">
-        <div>
-          {" "}
-          <h2 className="text-3xl font-bold text-center mb-5 text-black">
-            Service Coverage
-          </h2>
-        </div>
+        <h2 className="text-3xl font-bold text-center mb-5 text-black">
+          Service Coverage
+        </h2>
         <div className="md:px-20">
-          <BangladeshMap></BangladeshMap>
+          <BangladeshMap />
         </div>
       </div>
 
-      {/* Why Choose BookCourier */}
+      {/* Why Choose Section */}
       <div className="max-w-6xl mx-auto py-20 px-4">
-        <h2
-          className="text-3xl font-bold text-center mb-12 "
-          data-aos="fade-up"
-        >
+        <h2 className="text-3xl font-bold text-center mb-12" data-aos="fade-up">
           Why Choose BookCourier?
         </h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
             {
@@ -178,9 +169,7 @@ const Home = () => {
               <div className="flex justify-center mb-4 text-blue-600">
                 {item.icon}
               </div>
-              <h3 className="text-xl font-semibold mb-2 ">
-                {item.title}
-              </h3>
+              <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
               <p>{item.text}</p>
             </div>
           ))}
@@ -192,37 +181,44 @@ const Home = () => {
         className="bg-blue-50 flex justify-center items-center px-10 py-5 text-center max-w-6xl mx-auto"
         data-aos="fade-up"
       >
-       <div>
-         <h2 className="text-3xl font-bold mb-4 text-black">
-          Join Our Reading Community
-        </h2>
-        <p className="text-lg max-w-2xl mx-auto text-gray-700">
-          Discover new books, share your reviews, and connect with fellow
-          readers across Bangladesh.
-        </p>
-       </div>
-       <div>
-        <img className="shadow-2xl" src="https://img.freepik.com/free-photo/high-angle-people-reading-together_23-2150062128.jpg?semt=ais_se_enriched&w=740&q=80" alt="" />
-       </div>
+        <div>
+          <h2 className="text-3xl font-bold mb-4 text-black">
+            Join Our Reading Community
+          </h2>
+          <p className="text-lg max-w-2xl mx-auto text-gray-700">
+            Discover new books, share your reviews, and connect with fellow
+            readers across Bangladesh.
+          </p>
+        </div>
+        <div>
+          <img
+            className="shadow-2xl"
+            src="https://img.freepik.com/free-photo/high-angle-people-reading-together_23-2150062128.jpg"
+            alt=""
+          />
+        </div>
       </div>
 
       {/* Extra Section 2 */}
       <div
-        className="py-5 flex gap-5 mb-10  flex-row-reverse justify-center items-center text-center max-w-6xl mx-auto px-10 bg-blue-50 r"
+        className="py-5 flex gap-5 mb-10 flex-row-reverse justify-center items-center text-center max-w-6xl mx-auto px-10 bg-blue-50"
         data-aos="fade-up"
       >
-       <div >
-         <h2 className="text-3xl font-bold mb-4 text-black">
-          Special Weekly Offers
-        </h2>
-        <p className="text-lg max-w-2xl mx-auto text-gray-700">
-          Get exciting discounts every week on top-selling books. Stay tuned and
-          grab your favorite books now!
-        </p>
-       </div>
-       <div>
-        <img className="shadow-2xl" src="https://thumbs.dreamstime.com/b/exclusive-special-offer-logo-illustration-389557948.jpg" alt="" />
-       </div>
+        <div>
+          <h2 className="text-3xl font-bold mb-4 text-black">
+            Special Weekly Offers
+          </h2>
+          <p className="text-lg max-w-2xl mx-auto text-gray-700">
+            Get exciting discounts every week on top-selling books.
+          </p>
+        </div>
+        <div>
+          <img
+            className="shadow-2xl"
+            src="https://thumbs.dreamstime.com/b/exclusive-special-offer-logo-illustration-389557948.jpg"
+            alt=""
+          />
+        </div>
       </div>
     </div>
   );
