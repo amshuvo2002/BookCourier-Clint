@@ -33,6 +33,8 @@ import PrivateRoute from './PrivetRouts/PrivetRoute.jsx';
 import UserRoute from './PrivetRouts/UserRoute.jsx';
 import LibrarianRoute from './PrivetRouts/LibrarianRoute.jsx';
 import AdminRoute from './PrivetRouts/AdminRoute.jsx';
+import PaymentPage from './Pages/Payment.jsx';
+import { path } from 'framer-motion/m';
 
      
 const router = createBrowserRouter([
@@ -65,6 +67,7 @@ const router = createBrowserRouter([
         path: "/Books/:id",
         element: <PrivateRoute><BookDetails></BookDetails></PrivateRoute>
       },
+      
     ]
   },
 
@@ -72,11 +75,14 @@ const router = createBrowserRouter([
   path: "/dashboard",
   element: <PrivateRoute><DashboardLayout /></PrivateRoute>,
   children: [
+  
     {path: "monthlySales", element: <SalesChart></SalesChart>},
     // User
-    { path: "my-orders", element: <MyOrders />   },
+    { path: "my-orders", element: <MyOrders />, },
     { path: "profile", element:  <MyProfile /> },
     { path: "invoices", element:  <Invoices /> },
+    { path: "my-orders/payment/:id", element: <PaymentPage /> },
+    
 
     // Librarian
     { path: "add-book", element: <LibrarianRoute><AddBook /></LibrarianRoute> },

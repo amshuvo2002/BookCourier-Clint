@@ -11,14 +11,30 @@ export default function MyOrders() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Fetch User Orders
   useEffect(() => {
     if (!user?.email) return;
 
     const fetchOrders = async () => {
       try {
-        const res = await axiosSecure.get(`/orders/${user.email}`);
-        setOrders(res.data);
+        const ordersRes = await axiosSecure.get(`/orders/${user.email}`);
+        const ordersData = ordersRes.data;
+
+        const ordersWithPrice = await Promise.all(
+          ordersData.map(async (o) => {
+            let price = o.price || "N/A";
+            if ((!price || price === "N/A") && o.bookId) {
+              try {
+                const bookRes = await axiosSecure.get(`/books/${o.bookId}`);
+                price = bookRes.data.price || "N/A";
+              } catch (err) {
+                console.error("Book fetch error:", err);
+              }
+            }
+            return { ...o, price };
+          })
+        );
+
+        setOrders(ordersWithPrice);
       } catch (err) {
         console.error("Error fetching orders:", err);
       } finally {
@@ -29,11 +45,10 @@ export default function MyOrders() {
     fetchOrders();
   }, [user, axiosSecure]);
 
-  // Cancel Order
   const handleCancel = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
-      text: "Do you want to cancel this order?",
+      text: "Do you want to cancel this order permanently?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, cancel it!",
@@ -44,28 +59,15 @@ export default function MyOrders() {
 
     try {
       await axiosSecure.patch(`/orders/cancel/${id}`);
-      setOrders((prev) => prev.filter((o) => o._id !== id)); // remove from UI
+      setOrders((prev) => prev.filter((o) => o._id !== id));
       Swal.fire("Cancelled", "Your order has been cancelled!", "success");
     } catch (error) {
       Swal.fire("Error", "Failed to cancel order!", "error");
     }
   };
 
-  // Pay Order
-  const handlePay = async (id) => {
-    const confirm = await Swal.fire({
-      title: "Proceed to Payment?",
-      text: "Do you want to pay for this order now?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
-    });
-
-    if (!confirm.isConfirmed) return;
-
-    // Redirect to payment page (replace `/payment/${id}` with your payment route)
-    navigate(`/payment/${id}`);
+  const handlePay = (id) => {
+    navigate(`/dashboard/my-orders/payment/${id}`);
   };
 
   if (loading) return <p className="text-center mt-10">Loading orders...</p>;
@@ -78,6 +80,7 @@ export default function MyOrders() {
         <thead>
           <tr className="bg-gray-200">
             <th className="border p-2">Book Name</th>
+            <th className="border p-2">Price</th>
             <th className="border p-2">Date</th>
             <th className="border p-2">Cancel</th>
             <th className="border p-2">Pay Now</th>
@@ -87,57 +90,55 @@ export default function MyOrders() {
         <tbody>
           {orders.length === 0 && (
             <tr>
-              <td colSpan={4} className="text-center py-4">
+              <td colSpan={5} className="text-center py-4">
                 No orders found
               </td>
             </tr>
           )}
 
-          {orders.map((o) => (
-            <tr key={o._id}>
-              <td className="border p-2">{o.bookTitle || o.bookName || o.book || "N/A"}</td>
-              <td className="border p-2">
-                {o.orderDate
-                  ? new Date(o.orderDate).toLocaleDateString()
-                  : o.createdAt
-                  ? new Date(o.createdAt).toLocaleDateString()
-                  : "N/A"}
-              </td>
+          {orders.map((o) => {
+            const isPaid = o.paymentStatus === "paid" || o.status === "success";
 
-              {/* Cancel Button */}
-              <td className="border p-2">
-                {(o.status === "pending" || o.orderStatus === "pending") ? (
-                  <button
-                    onClick={() => handleCancel(o._id)}
-                    className="px-3 py-1 bg-red-500 text-white rounded"
-                  >
-                    Cancel
-                  </button>
-                ) : (
-                  <span className="text-red-600 font-bold">
-                    {o.status || o.orderStatus}
-                  </span>
-                )}
-              </td>
-
-              {/* Pay Now Button */}
-              <td className="border p-2">
-                {(o.status === "pending" || o.orderStatus === "pending") &&
-                o.paymentStatus !== "paid" ? (
-                  <button
-                    onClick={() => handlePay(o._id)}
-                    className="px-3 py-1 bg-green-600 text-white rounded"
-                  >
-                    Pay Now
-                  </button>
-                ) : (
-                  <span className="text-green-700 font-bold">
-                    {o.paymentStatus || "N/A"}
-                  </span>
-                )}
-              </td>
-            </tr>
-          ))}
+            return (
+              <tr key={o._id}>
+                <td className="border p-2">{o.bookTitle || o.bookName || "N/A"}</td>
+                <td className="border p-2">
+                  {isPaid ? (
+                    <span className="text-green-600 font-bold">Paid</span>
+                  ) : (
+                    `$${o.price}`
+                  )}
+                </td>
+                <td className="border p-2">
+                  {o.orderDate
+                    ? new Date(o.orderDate).toLocaleDateString()
+                    : o.createdAt
+                    ? new Date(o.createdAt).toLocaleDateString()
+                    : "N/A"}
+                </td>
+                <td className="border p-2">
+                  {!isPaid && (
+                    <button
+                      onClick={() => handleCancel(o._id)}
+                      className="px-3 py-1 bg-red-500 text-white rounded"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </td>
+                <td className="border p-2">
+                  {!isPaid && (
+                    <button
+                      onClick={() => handlePay(o._id)}
+                      className="px-3 py-1 bg-green-600 text-white rounded"
+                    >
+                      Pay Now
+                    </button>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

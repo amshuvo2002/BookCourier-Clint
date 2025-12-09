@@ -10,7 +10,7 @@ import { db } from "../Firebase/Firebase.init";
 
 export default function Register() {
   const [showPass, setShowPass] = useState(false);
-  const { register, googleLogin, setUser } = useContext(Authcontext);
+  const { register, googleLogin, setUser } = useContext(Authcontext); // FIXED
   const navigate = useNavigate();
 
   // Google Login
@@ -31,14 +31,12 @@ export default function Register() {
         });
       }
 
-      // SweetAlert
       await Swal.fire({
         icon: "success",
         title: "Google Login Successful!",
         text: "Welcome back!",
         timer: 2000,
         showConfirmButton: false,
-        timerProgressBar: true,
       });
 
       navigate("/");
@@ -54,32 +52,32 @@ export default function Register() {
   // Main Register Handler
   const handleRegister = async (e) => {
     e.preventDefault();
+
     const name = e.target.name.value;
     const email = e.target.email.value;
     const password = e.target.password.value;
     const image = e.target.image.files[0];
 
+    // Password check
     const passRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
     if (!passRegex.test(password)) {
       return Swal.fire({
         icon: "warning",
         title: "Weak Password!",
         text: "Password must be 6+ chars with 1 uppercase & 1 number.",
-        confirmButtonText: "OK",
       });
     }
 
     try {
+      // register from context
       const userCredential = await register(email, password, name, image);
       const user = userCredential.user;
 
-      // Fixed photoURL
       const photoURL = image ? URL.createObjectURL(image) : "";
 
-      // Update Firebase profile
       await updateProfile(user, { displayName: name, photoURL });
 
-      // Save user in Firestore
+      // Save user to Firestore
       await setDoc(doc(db, "users", user.uid), {
         name,
         email,
@@ -90,23 +88,20 @@ export default function Register() {
       // Update context
       setUser({ ...user, displayName: name, photoURL });
 
-      // SweetAlert
       await Swal.fire({
         icon: "success",
         title: "Registration Successful!",
         text: `Welcome, ${name}!`,
         timer: 2000,
         showConfirmButton: false,
-        timerProgressBar: true,
       });
 
-      navigate("/"); // Navigate after alert
+      navigate("/");
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "Registration Failed!",
         text: err.message,
-        confirmButtonText: "Try Again",
       });
     }
   };

@@ -3,7 +3,6 @@ import { Authcontext } from "../Context/Authcontext";
 import Swal from "sweetalert2";
 import UseAxious from "../Hooks/UseAxious";
 
-
 const RequestDelivery = () => {
     const { user } = useContext(Authcontext);
     const axiosSecure = UseAxious();
@@ -22,6 +21,7 @@ const RequestDelivery = () => {
             phone: form.phone.value,
             address: form.address.value,
             bookTitle: form.bookName.value,
+            price: form.price.value || "N/A", // <-- price field added
             orderDate: new Date(),
             status: "pending",
             paymentStatus: "unpaid",
@@ -50,6 +50,11 @@ const RequestDelivery = () => {
                 <div>
                     <label className="font-medium">Book Name</label>
                     <input type="text" name="bookName" required className="w-full p-2 border rounded mt-1" />
+                </div>
+
+                <div>
+                    <label className="font-medium">Price</label>
+                    <input type="number" name="price" required className="w-full p-2 border rounded mt-1" />
                 </div>
 
                 <div>
