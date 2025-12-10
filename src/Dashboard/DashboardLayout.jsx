@@ -15,7 +15,7 @@ export default function DashboardLayout() {
   return (
     <div>
       <Navbar />
-      <div className="flex min-h-screen">
+      <div className="flex bg-gray-900 min-h-screen">
         {/* Sidebar */}
         <div
           className={`bg-gray-900 text-white h-full p-5 transition-all duration-300 shadow-lg
@@ -82,6 +82,15 @@ export default function DashboardLayout() {
                   className="block hover:bg-gray-800 p-2 rounded-lg"
                 >
                   {isOpen ? "My Profile" : <CgProfile />}
+                </NavLink>
+              </li>
+
+              <li>
+                <NavLink
+                  to="/dashboard/admin/users"
+                  className="block hover:bg-gray-800 p-2 rounded-lg"
+                >
+                  {isOpen ? "Admin User" : <CgProfile />}
                 </NavLink>
               </li>
 

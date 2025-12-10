@@ -1,33 +1,31 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import UseAxious from "../Hooks/UseAxious";
 
 const AdminUsers = () => {
+    const axiosSecure = UseAxious();
     const [users, setUsers] = useState([]);
 
-    // Load all users
+    // Load all users from server
     useEffect(() => {
-        fetch("http://localhost:5000/users")
-            .then(res => res.json())
-            .then(data => setUsers(data));
-    }, []);
+        axiosSecure.get("/users")
+            .then(res => setUsers(res.data))
+            .catch(err => console.error(err));
+    }, [axiosSecure]);
 
     // Change Role Handler
-    const handleRoleChange = (id, newRole) => {
-        fetch(`http://localhost:5000/users/role/${id}`, {
-            method: "PATCH",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ role: newRole })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.modifiedCount > 0) {
+    const handleRoleChange = (email, newRole) => {
+        axiosSecure.put(`/users/role/${email}`, { role: newRole })
+            .then(res => {
+                if (res.data.modifiedCount > 0) {
                     Swal.fire("Success!", `User role changed to ${newRole}`, "success");
                     const updatedUsers = users.map(user =>
-                        user._id === id ? { ...user, role: newRole } : user
+                        user.email === email ? { ...user, role: newRole } : user
                     );
                     setUsers(updatedUsers);
                 }
-            });
+            })
+            .catch(err => console.error(err));
     };
 
     return (
@@ -47,54 +45,58 @@ const AdminUsers = () => {
                     </thead>
 
                     <tbody>
-                        {users.map((user, index) => (
-                            <tr key={user._id}>
-                                <td>{index + 1}</td>
-                                <td>{user.name}</td>
-                                <td>{user.email}</td>
-                                <td>
-                                    <span className={`px-2 py-1 rounded text-white 
-                                        ${user.role === "admin" ? "bg-red-600" :
-                                          user.role === "librarian" ? "bg-blue-600" :
-                                          "bg-green-600"}`}>
-                                        {user.role}
-                                    </span>
-                                </td>
+                        {users.length > 0 ? (
+                            users.map((user, index) => (
+                                <tr key={user._id}>
+                                    <td>{index + 1}</td>
+                                    <td>{user.name || "No Name"}</td>
+                                    <td>{user.email}</td>
+                                    <td>
+                                        <span className={`px-2 py-1 rounded text-white 
+                                            ${user.role === "admin" ? "bg-red-600" :
+                                              user.role === "librarian" ? "bg-blue-600" :
+                                              "bg-green-600"}`}>
+                                            {user.role || "user"}
+                                        </span>
+                                    </td>
+                                    <td className="flex gap-2 justify-center">
+                                        {user.role !== "admin" && (
+                                            <button
+                                                onClick={() => handleRoleChange(user.email, "admin")}
+                                                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                            >
+                                                Make Admin
+                                            </button>
+                                        )}
 
-                                <td className="flex gap-2 justify-center">
+                                        {user.role !== "librarian" && (
+                                            <button
+                                                onClick={() => handleRoleChange(user.email, "librarian")}
+                                                className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                            >
+                                                Make Librarian
+                                            </button>
+                                        )}
 
-                                    {user.role !== "admin" && (
-                                        <button
-                                            onClick={() => handleRoleChange(user._id, "admin")}
-                                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                                        >
-                                            Make Admin
-                                        </button>
-                                    )}
-
-                                    {user.role !== "librarian" && (
-                                        <button
-                                            onClick={() => handleRoleChange(user._id, "librarian")}
-                                            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                        >
-                                            Make Librarian
-                                        </button>
-                                    )}
-
-                                    {user.role !== "user" && (
-                                        <button
-                                            onClick={() => handleRoleChange(user._id, "user")}
-                                            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                                        >
-                                            Make User
-                                        </button>
-                                    )}
-
+                                        {user.role !== "user" && (
+                                            <button
+                                                onClick={() => handleRoleChange(user.email, "user")}
+                                                className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                                            >
+                                                Make User
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5" className="text-center py-5 font-bold">
+                                    No Users Found.
                                 </td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
-
                 </table>
             </div>
         </div>
