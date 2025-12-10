@@ -6,26 +6,67 @@ const AdminUsers = () => {
     const axiosSecure = UseAxious();
     const [users, setUsers] = useState([]);
 
-    // Load all users from server
-    useEffect(() => {
-        axiosSecure.get("/users")
-            .then(res => setUsers(res.data))
-            .catch(err => console.error(err));
-    }, [axiosSecure]);
+    // -----------------------------
+    // Load all users from MongoDB
+    // -----------------------------
+    const fetchUsers = async () => {
+        try {
+            const res = await axiosSecure.get("/users");
+            setUsers(res.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-    // Change Role Handler
-    const handleRoleChange = (email, newRole) => {
-        axiosSecure.put(`/users/role/${email}`, { role: newRole })
-            .then(res => {
-                if (res.data.modifiedCount > 0) {
-                    Swal.fire("Success!", `User role changed to ${newRole}`, "success");
-                    const updatedUsers = users.map(user =>
-                        user.email === email ? { ...user, role: newRole } : user
-                    );
-                    setUsers(updatedUsers);
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    // -----------------------------
+    // Handle Role Change
+    // -----------------------------
+    const handleRoleChange = async (email, newRole) => {
+        try {
+            const res = await axiosSecure.put(`/users/role/${email}`, { role: newRole });
+            if (res.data.modifiedCount > 0) {
+                Swal.fire("Success!", `User role changed to ${newRole}`, "success");
+
+                // Update local state
+                const updatedUsers = users.map(user =>
+                    user.email === email ? { ...user, role: newRole } : user
+                );
+                setUsers(updatedUsers);
+            }
+        } catch (err) {
+            console.error(err);
+            Swal.fire("Error!", "Failed to update role", "error");
+        }
+    };
+
+    // -----------------------------
+    // Handle Delete User
+    // -----------------------------
+    const handleDeleteUser = async (email) => {
+        Swal.fire({
+            title: `Are you sure you want to delete ${email}?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete",
+            cancelButtonText: "Cancel",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const res = await axiosSecure.delete(`/users/${email}`);
+                    if (res.data.deletedCount > 0) {
+                        Swal.fire("Deleted!", "User has been deleted.", "success");
+                        setUsers(users.filter(user => user.email !== email));
+                    }
+                } catch (err) {
+                    console.error(err);
+                    Swal.fire("Error!", "Failed to delete user", "error");
                 }
-            })
-            .catch(err => console.error(err));
+            }
+        });
     };
 
     return (
@@ -86,6 +127,14 @@ const AdminUsers = () => {
                                                 Make User
                                             </button>
                                         )}
+
+                                        {/* Delete User Button */}
+                                        <button
+                                            onClick={() => handleDeleteUser(user.email)}
+                                            className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-800"
+                                        >
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             ))
