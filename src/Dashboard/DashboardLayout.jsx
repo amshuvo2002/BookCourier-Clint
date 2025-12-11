@@ -1,211 +1,92 @@
-import { Outlet, NavLink } from "react-router";
-import { useState, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Link, Outlet, useNavigate } from "react-router";
 import Navbar from "../Components/Navbar";
-import Footer from "../Components/Footer";
 import { Authcontext } from "../Context/Authcontext";
-import { FcSalesPerformance } from "react-icons/fc";
-import { CgProfile } from "react-icons/cg";
-import { BiBookAdd } from "react-icons/bi";
-import { MdMenuBook } from "react-icons/md";
+import axios from "axios";
 
-export default function DashboardLayout() {
-  const [isOpen, setIsOpen] = useState(true);
-  const { user } = useContext(Authcontext);
+const DashboardLayout = () => {
+  const { user, loading: authLoading } = useContext(Authcontext);
+  const [role, setRole] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  // Fetch role from backend
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (user?.email) {
+        try {
+          const res = await axios.get(`http://localhost:3000/api/getRole?email=${user.email}`);
+          const userRole = res.data.role;
+          setRole(userRole);
+
+          // Auto redirect based on role if at /dashboard
+          if (window.location.pathname === "/dashboard") {
+            if (userRole === "admin") navigate("/dashboard/admin/users", { replace: true });
+            else if (userRole === "librarian") navigate("/dashboard/librarian/dashboard", { replace: true });
+            else navigate("/dashboard/profile", { replace: true });
+          }
+        } catch (err) {
+          console.error("Failed to fetch role:", err);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    if (!authLoading) fetchRole();
+  }, [authLoading, user, navigate]);
+
+  if (authLoading || loading) return <p className="p-5 text-center">Loading...</p>;
 
   return (
     <div>
       <Navbar />
-      <div className="flex bg-gray-900 min-h-screen">
-        {/* Sidebar */}
-        <div
-          className={`bg-gray-900 text-white h-full p-5 transition-all duration-300 shadow-lg
-    ${isOpen ? "w-64" : "w-20"} flex flex-col`}
-        >
-          {/* Toggle Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="mb-6 bg-gray-800 hover:bg-gray-700 p-2 rounded-lg flex items-center justify-center transition"
-          >
-            {isOpen ? (
-              <span className="text-lg font-bold">&lt;</span>
-            ) : (
-              <span className="text-lg font-bold">&gt;</span>
+
+      <div className="drawer drawer-mobile">
+        <input id="dashboard-drawer" type="checkbox" className="drawer-toggle" />
+        <div className="drawer-content p-5">
+          <Outlet />
+        </div>
+
+        <div className="drawer-side bg-gray-100">
+          <label htmlFor="dashboard-drawer" className="drawer-overlay"></label>
+          <ul className="menu p-4 w-64 space-y-2">
+            <li>
+              <Link to="/dashboard/profile">My Profile</Link>
+            </li>
+            {role === "user" && (
+              <>
+                <li><Link to="/dashboard/my-orders">My Orders</Link></li>
+                <li><Link to="/dashboard/invoices">Invoices</Link></li>
+              </>
             )}
-          </button>
-
-          {/* Sidebar Links */}
-          <ul className="space-y-4 text-sm font-medium tracking-wide">
-            {/* Sales Chart - Admin only */}
-            {user?.role === "admin" && (
-              <div>
-                <h3
-                  className={`text-gray-400 mb-1 transition ${
-                    isOpen ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  Sales Chart
-                </h3>
-                <li>
-                  <NavLink
-                    to="/dashboard/monthlySales"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "Monthly Sales" : <FcSalesPerformance />}
-                  </NavLink>
-                </li>
-                <hr className="border-gray-700" />
-              </div>
+            {role === "librarian" && (
+              <>
+                <li><Link to="/dashboard/librarian/dashboard">Dashboard</Link></li>
+                <li><Link to="/dashboard/librarian/manage-books">Manage Books</Link></li>
+                <li><Link to="/dashboard/librarian/add-book">Add Book</Link></li>
+                <li><Link to="/dashboard/librarian/requests">Requests</Link></li>
+                <li><Link to="/dashboard/librarian/returns">Returns</Link></li>
+                <li><Link to="/dashboard/librarian/reports">Reports</Link></li>
+              </>
             )}
-
-            {/* User Section */}
-            <div>
-              <h3
-                className={`text-gray-400 mb-1 transition ${
-                  isOpen ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                My Dashboard
-              </h3>
-
-              <li>
-                <NavLink
-                  to="/dashboard/my-orders"
-                  className="block hover:bg-gray-800 p-2 rounded-lg"
-                >
-                  {isOpen ? "My Orders" : "🛒"}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink
-                  to="/dashboard/profile"
-                  className="block hover:bg-gray-800 p-2 rounded-lg"
-                >
-                  {isOpen ? "My Profile" : <CgProfile />}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink
-                  to="/dashboard/admin/users"
-                  className="block hover:bg-gray-800 p-2 rounded-lg"
-                >
-                  {isOpen ? "Admin User" : <CgProfile />}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink
-                  to="/dashboard/invoices"
-                  className="block hover:bg-gray-800 p-2 rounded-lg"
-                >
-                  {isOpen ? "Invoices" : "📄"}
-                </NavLink>
-              </li>
-
-              <hr className="border-gray-700" />
-            </div>
-
-            {/* Librarian Section */}
-            {user?.role === "librarian" && (
-              <div>
-                <h3
-                  className={`text-gray-400 mb-1 transition ${
-                    isOpen ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  Librarian Panel
-                </h3>
-                <li>
-                  <NavLink
-                    to="/dashboard/add-book"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "Add Book" : <BiBookAdd />}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/dashboard/my-books"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "My Books" : <MdMenuBook />}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/dashboard/orders"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "Orders" : "📦"}
-                  </NavLink>
-                </li>
-                <hr className="border-gray-700" />
-              </div>
-            )}
-
-            {/* Admin Section */}
-            {user?.role === "admin" && (
-              <div>
-                <h3
-                  className={`text-gray-400 mb-1 transition ${
-                    isOpen ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  Admin Panel
-                </h3>
-                <li>
-                  <NavLink
-                    to="/dashboard/users"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "All Users" : "👥"}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/dashboard/orders"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "All Orders" : "🧾"}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/dashboard/books"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "Manage Books" : "📚"}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/dashboard/add-book"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "Add Books" : "➕"}
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/dashboard/settings"
-                    className="block hover:bg-gray-800 p-2 rounded-lg"
-                  >
-                    {isOpen ? "Settings" : "⚙️"}
-                  </NavLink>
-                </li>
-                <hr className="border-gray-700" />
-              </div>
+            {role === "admin" && (
+              <>
+                <li><Link to="/dashboard/admin/users">Users</Link></li>
+                <li><Link to="/dashboard/admin/books">Books</Link></li>
+                <li><Link to="/dashboard/admin/orders">Orders</Link></li>
+                <li><Link to="/dashboard/admin/add-books">Add Book</Link></li>
+                <li><Link to="/dashboard/admin/site-setting">Site Setting</Link></li>
+                <li><Link to="/dashboard/admin/request-delivery">Request Delivery</Link></li>
+              </>
             )}
           </ul>
         </div>
-
-        {/* MAIN CONTENT */}
-        <div className="flex-1 bg-gray-100 p-6">
-          <Outlet />
-        </div>
       </div>
-      <Footer />
     </div>
   );
-}
+};
+
+export default DashboardLayout;

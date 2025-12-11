@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { Authcontext } from "../Context/Authcontext";
+import { Navigate } from "react-router";
 
 export default function UserRoute({ children }) {
   const { user, loading } = useContext(Authcontext);

@@ -22,7 +22,7 @@ export default function Login() {
   const googleProvider = new GoogleAuthProvider();
 
   // -------------------------------------------------------
-  // ⭐ GOOGLE LOGIN + MongoDB user save
+  // ⭐ GOOGLE LOGIN + MongoDB user save + role redirect
   // -------------------------------------------------------
   const handleGoogleLogin = async () => {
     try {
@@ -37,6 +37,10 @@ export default function Login() {
         photoURL: user.photoURL,
       });
 
+      // ⭐ Fetch role from backend
+      const roleRes = await axiosSecure.get(`/api/getRole?email=${user.email}`);
+      const role = roleRes.data.role;
+
       Swal.fire({
         icon: "success",
         title: "Google Login Successful!",
@@ -45,7 +49,11 @@ export default function Login() {
         showConfirmButton: false,
       });
 
-      navigate(from, { replace: true });
+      // ⭐ Redirect based on role
+      if (role === "admin") navigate("/dashboard/admin/users", { replace: true });
+      else if (role === "librarian") navigate("/dashboard/librarian/dashboard", { replace: true });
+      else navigate("/dashboard/profile", { replace: true });
+
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -56,7 +64,7 @@ export default function Login() {
   };
 
   // -------------------------------------------------------
-  // ⭐ EMAIL/PASSWORD LOGIN + MongoDB check
+  // ⭐ EMAIL/PASSWORD LOGIN + MongoDB check + role redirect
   // -------------------------------------------------------
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -67,13 +75,17 @@ export default function Login() {
       const result = await signIn(email, password);
       const user = result.user;
 
-      // ⭐ Ensure user exists in MongoDB
+      // Ensure user exists in MongoDB
       await axiosSecure.post("/users", {
         name: user.displayName || "",
         email: user.email,
         role: "user",
         photoURL: user.photoURL || "",
       });
+
+      // ⭐ Fetch role from backend
+      const roleRes = await axiosSecure.get(`/api/getRole?email=${user.email}`);
+      const role = roleRes.data.role;
 
       Swal.fire({
         icon: "success",
@@ -83,7 +95,11 @@ export default function Login() {
         showConfirmButton: false,
       });
 
-      navigate(from, { replace: true });
+      // ⭐ Redirect based on role
+      if (role === "admin") navigate("/dashboard/admin/users", { replace: true });
+      else if (role === "librarian") navigate("/dashboard/librarian/dashboard", { replace: true });
+      else navigate("/dashboard/profile", { replace: true });
+
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -93,17 +109,14 @@ export default function Login() {
     }
   };
 
-  
-
   // -------------------------------------------------------
-  // ⭐ UI SECTION
+  // ⭐ UI SECTION (NO CHANGE)
   // -------------------------------------------------------
   return (
     <div className="w-full max-w-sm mx-auto border mb-10 p-6 mt-10 rounded-xl">
       <h2 className="text-xl font-bold mb-4 text-center">Login</h2>
 
       <form onSubmit={handleLogin}>
-        {/* Email */}
         <input
           type="email"
           name="email"
@@ -112,7 +125,6 @@ export default function Login() {
           required
         />
 
-        {/* Password */}
         <div className="relative mb-3">
           <input
             type={showPass ? "text" : "password"}
@@ -121,7 +133,6 @@ export default function Login() {
             className="input input-bordered w-full pr-10"
             required
           />
-
           <span
             onClick={() => setShowPass(!showPass)}
             className="absolute right-3 top-3 cursor-pointer text-xl"
@@ -130,10 +141,8 @@ export default function Login() {
           </span>
         </div>
 
-        {/* Login Button */}
         <button className="btn btn-primary w-full mb-3">Login</button>
 
-        {/* Google Login */}
         <button
           type="button"
           onClick={handleGoogleLogin}
@@ -142,7 +151,6 @@ export default function Login() {
           <FcGoogle className="text-2xl" /> Login with Google
         </button>
 
-        {/* Register Link */}
         <p className="text-center mt-4 text-sm">
           Don't have an account?{" "}
           <Link to="/register" className="text-blue-600 font-semibold">
