@@ -1,32 +1,37 @@
 import { useContext, useEffect, useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router";
+import { Link, Outlet, useNavigate, useLocation } from "react-router";
 import Navbar from "../Components/Navbar";
 import { Authcontext } from "../Context/Authcontext";
-import axios from "axios";
+import UseAxious from "../Hooks/UseAxious";
 
 const DashboardLayout = () => {
   const { user, loading: authLoading } = useContext(Authcontext);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+  const axiosSecure = UseAxious();
 
   // Fetch role from backend
   useEffect(() => {
     const fetchRole = async () => {
       if (user?.email) {
         try {
-          const res = await axios.get(`http://localhost:3000/api/getRole?email=${user.email}`);
-          const userRole = res.data.role;
+          const res = await axiosSecure.get(`/api/getRole?email=${user.email}`);
+          const userRole = res.data.role || "user";
           setRole(userRole);
 
-          // Auto redirect based on role if at /dashboard
-          if (window.location.pathname === "/dashboard") {
-            if (userRole === "admin") navigate("/dashboard/admin/users", { replace: true });
-            else if (userRole === "librarian") navigate("/dashboard/librarian/dashboard", { replace: true });
+          // Auto redirect if at /dashboard
+          if (location.pathname === "/dashboard") {
+            if (userRole === "admin")
+              navigate("/dashboard/admin/users", { replace: true });
+            else if (userRole === "librarian")
+              navigate("/dashboard/librarian/dashboard", { replace: true });
             else navigate("/dashboard/profile", { replace: true });
           }
         } catch (err) {
           console.error("Failed to fetch role:", err);
+          setRole("user"); // default role
         } finally {
           setLoading(false);
         }
@@ -36,9 +41,35 @@ const DashboardLayout = () => {
     };
 
     if (!authLoading) fetchRole();
-  }, [authLoading, user, navigate]);
+  }, [authLoading, user, navigate, location.pathname, axiosSecure]);
 
-  if (authLoading || loading) return <p className="p-5 text-center">Loading...</p>;
+  if (authLoading || loading)
+    return <p className="p-5 text-center">Loading...</p>;
+
+  // Sidebar links
+  const sidebarLinks = {
+    user: [
+      { name: "My Profile", path: "/dashboard/profile" },
+      { name: "My Orders", path: "/dashboard/my-orders" },
+      { name: "Invoices", path: "/dashboard/invoices" },
+    ],
+    librarian: [
+      { name: "Dashboard", path: "/dashboard/librarian/dashboard" },
+      { name: "Manage Books", path: "/dashboard/librarian/manage-books" },
+      { name: "Add Book", path: "/dashboard/librarian/add-book" },
+      { name: "Requests", path: "/dashboard/librarian/requests" },
+      { name: "Returns", path: "/dashboard/librarian/returns" },
+      { name: "Reports", path: "/dashboard/librarian/reports" },
+    ],
+    admin: [
+      { name: "Users", path: "/dashboard/admin/users" },
+      { name: "Books", path: "/dashboard/admin/books" },
+      { name: "Orders", path: "/dashboard/admin/orders" },
+      { name: "Add Book", path: "/dashboard/admin/add-books" },
+      { name: "Site Setting", path: "/dashboard/admin/site-setting" },
+      { name: "Request Delivery", path: "/dashboard/admin/request-delivery" },
+    ],
+  };
 
   return (
     <div>
@@ -53,35 +84,11 @@ const DashboardLayout = () => {
         <div className="drawer-side bg-gray-100">
           <label htmlFor="dashboard-drawer" className="drawer-overlay"></label>
           <ul className="menu p-4 w-64 space-y-2">
-            <li>
-              <Link to="/dashboard/profile">My Profile</Link>
-            </li>
-            {role === "user" && (
-              <>
-                <li><Link to="/dashboard/my-orders">My Orders</Link></li>
-                <li><Link to="/dashboard/invoices">Invoices</Link></li>
-              </>
-            )}
-            {role === "librarian" && (
-              <>
-                <li><Link to="/dashboard/librarian/dashboard">Dashboard</Link></li>
-                <li><Link to="/dashboard/librarian/manage-books">Manage Books</Link></li>
-                <li><Link to="/dashboard/librarian/add-book">Add Book</Link></li>
-                <li><Link to="/dashboard/librarian/requests">Requests</Link></li>
-                <li><Link to="/dashboard/librarian/returns">Returns</Link></li>
-                <li><Link to="/dashboard/librarian/reports">Reports</Link></li>
-              </>
-            )}
-            {role === "admin" && (
-              <>
-                <li><Link to="/dashboard/admin/users">Users</Link></li>
-                <li><Link to="/dashboard/admin/books">Books</Link></li>
-                <li><Link to="/dashboard/admin/orders">Orders</Link></li>
-                <li><Link to="/dashboard/admin/add-books">Add Book</Link></li>
-                <li><Link to="/dashboard/admin/site-setting">Site Setting</Link></li>
-                <li><Link to="/dashboard/admin/request-delivery">Request Delivery</Link></li>
-              </>
-            )}
+            {(sidebarLinks[role] || []).map((link) => (
+              <li key={link.path}>
+                <Link to={link.path}>{link.name}</Link>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

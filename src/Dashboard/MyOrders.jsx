@@ -16,27 +16,33 @@ export default function MyOrders() {
 
     const fetchOrders = async () => {
       try {
+        // ✅ Get orders for user
         const ordersRes = await axiosSecure.get(`/orders/${user.email}`);
         const ordersData = ordersRes.data;
 
         const ordersWithPrice = await Promise.all(
-          ordersData.map(async (o) => {
-            let price = o.price || "N/A";
-            if ((!price || price === "N/A") && o.bookId) {
-              try {
-                const bookRes = await axiosSecure.get(`/books/${o.bookId}`);
-                price = bookRes.data.price || "N/A";
-              } catch (err) {
-                console.error("Book fetch error:", err);
+          ordersData
+            .filter(o => o.status !== "cancelled") // hide cancelled orders
+            .map(async (o) => {
+              let price = o.price || "N/A";
+
+              if ((!price || price === "N/A") && o.bookId) {
+                try {
+                  const bookRes = await axiosSecure.get(`/books/${o.bookId}`);
+                  price = bookRes.data.price || "N/A";
+                } catch (err) {
+                  console.error("Book fetch error:", err);
+                }
               }
-            }
-            return { ...o, price };
-          })
+
+              return { ...o, price };
+            })
         );
 
         setOrders(ordersWithPrice);
       } catch (err) {
         console.error("Error fetching orders:", err);
+        Swal.fire("Error", "Failed to fetch orders!", "error");
       } finally {
         setLoading(false);
       }
@@ -58,7 +64,7 @@ export default function MyOrders() {
     if (!confirm.isConfirmed) return;
 
     try {
-      await axiosSecure.patch(`/orders/cancel/${id}`);
+      await axiosSecure.put(`/orders/${id}/cancel`);
       setOrders((prev) => prev.filter((o) => o._id !== id));
       Swal.fire("Cancelled", "Your order has been cancelled!", "success");
     } catch (error) {

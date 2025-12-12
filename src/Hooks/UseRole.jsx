@@ -9,12 +9,22 @@ export default function UseRole() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.email) {
-      axiosSecure.get(`/userRole/${user.email}`).then(res => {
-        setRole(res.data.role);
+    const fetchRole = async () => {
+      if (!user?.email) {
         setLoading(false);
-      });
-    }
+        return;
+      }
+      try {
+        const res = await axiosSecure.get(`/api/getRole?email=${user.email}`);
+        setRole(res.data.role);
+      } catch (err) {
+        console.error("Failed to fetch role:", err);
+        setRole(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRole();
   }, [user]);
 
   return [role, loading];

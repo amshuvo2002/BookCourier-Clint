@@ -22,6 +22,7 @@ import MyOrders from "./Dashboard/MyOrders.jsx";
 import Invoices from "./Dashboard/Invoice.jsx";
 import SalesChart from "./Pages/SalesChart.jsx";
 import PaymentPage from "./Pages/Payment.jsx";
+import UserDashboard from "./Dashboard/UserDashboard.jsx";
 
 // Librarian Pages
 import LibrarianDashboard from "./Librarian/LibrarianDashboard.jsx";
@@ -45,8 +46,8 @@ import AdminRequestDelivery from "./Admin/AdminRequestDelivery.jsx";
 import Authprovider from "./Context/Authprovider.jsx";
 import PrivateRoute from "./PrivetRouts/PrivetRoute.jsx";
 
-
 import "leaflet/dist/leaflet.css";
+import MyDashboard from "./Dashboard/MyDashboard.jsx";
 
 const router = createBrowserRouter([
   // ====================
@@ -92,22 +93,30 @@ const router = createBrowserRouter([
     ),
     children: [
       // ====================
-      // USER ROUTES
+      // USER DEFAULT DASHBOARD
       // ====================
+      {
+        path: "user",
+        element: <UserDashboard></UserDashboard>,
+        children: [
       { path: "profile", element: <MyProfile /> },
       { path: "my-orders", element: <MyOrders /> },
       { path: "invoices", element: <Invoices /> },
       { path: "my-orders/payment/:id", element: <PaymentPage /> },
+        ]
+      },
+
+    
 
       // ====================
       // LIBRARIAN ROUTES
       // ====================
       {
         path: "librarian",
-        element: <LibrarianDashboard />, // Sidebar + Outlet
+        element: <LibrarianDashboard />,
         children: [
-          { path: "dashboard", element: <ManageBooks /> }, // Default page or dashboard overview
-          { path: "manage-books", element: <ManageBooks></ManageBooks> },
+          { path: "dashboard", element: <ManageBooks /> },
+          { path: "manage-books", element: <ManageBooks /> },
           { path: "add-book", element: <AddBook /> },
           { path: "edit-book/:id", element: <EditBook /> },
           { path: "requests", element: <ManageRequests /> },
@@ -121,9 +130,9 @@ const router = createBrowserRouter([
       // ====================
       {
         path: "admin",
-        element: <AdminDashboard />, // Sidebar + Outlet
+        element: <AdminDashboard />,
         children: [
-          { path: "dashboard", element: <AdminAddBook /> }, // Optional admin overview
+          { path: "dashboard", element: <AdminAddBook /> },
           { path: "monthlySales", element: <SalesChart /> },
           { path: "add-books", element: <AdminAddBook /> },
           { path: "books", element: <AdminBooks /> },
