@@ -39,15 +39,13 @@ import AdminAddBook from "./Admin/AdminAddBook.jsx";
 import AdminBooks from "./Admin/AdminBooks.jsx";
 import AdminOrders from "./Admin/AdminOrders.jsx";
 import AdminUsers from "./Admin/AdminUsers.jsx";
-import SiteSettings from "./Admin/SiteSetting.jsx";
 import AdminRequestDelivery from "./Admin/AdminRequestDelivery.jsx";
 
 // Routes Protection
 import Authprovider from "./Context/Authprovider.jsx";
 import PrivateRoute from "./PrivetRouts/PrivetRoute.jsx";
-
 import "leaflet/dist/leaflet.css";
-import MyDashboard from "./Dashboard/MyDashboard.jsx";
+
 
 const router = createBrowserRouter([
   // ====================
@@ -138,7 +136,6 @@ const router = createBrowserRouter([
           { path: "books", element: <AdminBooks /> },
           { path: "orders", element: <AdminOrders /> },
           { path: "users", element: <AdminUsers /> },
-          { path: "site-setting", element: <SiteSettings /> },
           { path: "request-delivery", element: <AdminRequestDelivery /> },
         ],
       },

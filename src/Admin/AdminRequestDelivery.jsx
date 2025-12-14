@@ -1,3 +1,4 @@
+// File: AdminRequestDelivery.jsx
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import UseAxious from "../Hooks/UseAxious";
@@ -7,77 +8,66 @@ export default function AdminRequestDelivery() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Load delivery requests
-  useEffect(() => {
-    axiosSecure.get("/delivery-requests").then((res) => {
+  const fetchRequests = async () => {
+    try {
+      const res = await axiosSecure.get("/delivery-requests");
       setRequests(res.data);
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to load delivery requests", "error");
+    } finally {
       setLoading(false);
-    });
-  }, [axiosSecure]);
+    }
+  };
 
-  // Approve Delivery
-  const handleApprove = (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You want to approve this delivery?",
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const handleUpdateStatus = async (id, status) => {
+    const confirmText = status === "approved" ? "approve" : "reject";
+    const result = await Swal.fire({
+      title: `Are you sure to ${confirmText}?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, approve",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axiosSecure.patch(`/delivery-requests/approve/${id}`).then((res) => {
-          if (res.data.modifiedCount > 0) {
-            Swal.fire("Approved!", "Delivery request approved.", "success");
-            setRequests((prev) =>
-              prev.map((item) =>
-                item._id === id ? { ...item, status: "approved" } : item
-              )
-            );
-          }
-        });
-      }
+      confirmButtonText: `Yes, ${confirmText}`,
     });
+
+    if (result.isConfirmed) {
+      try {
+        const res = await axiosSecure.patch(
+          `/delivery-requests/${status}/${id}`
+        );
+        if (res.data.modifiedCount > 0) {
+          Swal.fire(
+            status === "approved" ? "Approved!" : "Rejected!",
+            `Delivery request ${status}.`,
+            status === "approved" ? "success" : "error"
+          );
+          // update local state
+          setRequests((prev) =>
+            prev.map((item) =>
+              item._id === id ? { ...item, status } : item
+            )
+          );
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Failed to update delivery request", "error");
+      }
+    }
   };
 
-  // Reject Delivery
-  const handleReject = (id) => {
-    Swal.fire({
-      title: "Reject this request?",
-      text: "This delivery request will be rejected!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Reject",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axiosSecure.patch(`/delivery-requests/reject/${id}`).then((res) => {
-          if (res.data.modifiedCount > 0) {
-            Swal.fire("Rejected!", "Delivery request rejected.", "error");
-            setRequests((prev) =>
-              prev.map((item) =>
-                item._id === id ? { ...item, status: "rejected" } : item
-              )
-            );
-          }
-        });
-      }
-    });
-  };
-
-  if (loading) {
-    return <p className="text-center py-10 font-bold">Loading...</p>;
-  }
+  if (loading) return <p className="text-center py-10 font-bold">Loading...</p>;
 
   return (
-    <div className="p-6">
+    <div className="p-6 text-black">
       <h2 className="text-2xl font-bold mb-5">📦 Admin Delivery Requests</h2>
-
       <div className="overflow-x-auto">
         <table className="table w-full border">
-          <thead className="bg-gray-100">
+          <thead className="bg-gray-100 text-black">
             <tr>
               <th>#</th>
               <th>User</th>
@@ -87,14 +77,20 @@ export default function AdminRequestDelivery() {
               <th className="text-center">Actions</th>
             </tr>
           </thead>
-
           <tbody>
+            {requests.length === 0 && (
+              <tr>
+                <td colSpan="6" className="text-center py-5 font-bold">
+                  No Delivery Requests Found.
+                </td>
+              </tr>
+            )}
             {requests.map((r, index) => (
               <tr key={r._id}>
                 <td>{index + 1}</td>
-                <td>{r.userEmail}</td>
-                <td>{r.bookName}</td>
-                <td>{r.address}</td>
+                <td>{r.user || r.userEmail || "Unknown"}</td>
+                <td>{r.book || r.bookName || "Unknown"}</td>
+                <td>{r.address || "No address provided"}</td>
                 <td>
                   <span
                     className={`px-2 py-1 rounded text-white ${
@@ -108,34 +104,24 @@ export default function AdminRequestDelivery() {
                     {r.status}
                   </span>
                 </td>
-
-                <td className="text-center">
+                <td className="text-center flex justify-center gap-2">
                   <button
-                    onClick={() => handleApprove(r._id)}
+                    onClick={() => handleUpdateStatus(r._id, "approved")}
                     disabled={r.status !== "pending"}
-                    className="btn btn-success btn-sm mr-2"
+                    className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
                   >
                     Approve
                   </button>
-
                   <button
-                    onClick={() => handleReject(r._id)}
+                    onClick={() => handleUpdateStatus(r._id, "rejected")}
                     disabled={r.status !== "pending"}
-                    className="btn btn-error btn-sm"
+                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                   >
                     Reject
                   </button>
                 </td>
               </tr>
             ))}
-
-            {requests.length === 0 && (
-              <tr>
-                <td colSpan="6" className="text-center py-5 font-bold">
-                  No Delivery Requests Found.
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
       </div>

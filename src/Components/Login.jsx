@@ -98,7 +98,7 @@ export default function Login() {
       // ⭐ Redirect based on role
       if (role === "admin") navigate("/dashboard/admin/users", { replace: true });
       else if (role === "librarian") navigate("/dashboard/librarian/dashboard", { replace: true });
-      else navigate("/dashboard/profile", { replace: true });
+      else navigate("/", { replace: true });
 
     } catch (err) {
       Swal.fire({

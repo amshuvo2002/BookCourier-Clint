@@ -14,19 +14,19 @@ export default function Reports() {
     <div>
       <h1 className="text-2xl font-bold mb-4">Reports</h1>
 
-      <div className="stats shadow">
+      <div className="stats shadow text-black">
         <div className="stat">
-          <div className="stat-title">Total Books</div>
-          <div className="stat-value">{stats.books}</div>
+          <div className="stat-title text-black ">Total Books</div>
+          <div className="stat-value ">{stats.books}</div>
         </div>
 
         <div className="stat">
-          <div className="stat-title">Issued</div>
+          <div className="stat-title text-black">Issued</div>
           <div className="stat-value">{stats.issued}</div>
         </div>
 
         <div className="stat">
-          <div className="stat-title">Returned</div>
+          <div className="stat-title text-black">Returned</div>
           <div className="stat-value">{stats.returned}</div>
         </div>
       </div>

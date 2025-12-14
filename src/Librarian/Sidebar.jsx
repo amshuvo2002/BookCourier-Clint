@@ -1,59 +1,74 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router";
-import { FiBook, FiPlusCircle, FiClipboard, FiUsers, FiSettings, FiPackage } from "react-icons/fi";
+import {
+  FiBook,
+  FiPlusCircle,
+  FiClipboard,
+  FiSettings,
+  FiPackage,
+  FiMenu
+} from "react-icons/fi";
 
 export default function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const links = [
-    { name: "Manage Books", path: "manage-books", icon: <FiBook size={24} /> },
-    { name: "Add Book", path: "add-book", icon: <FiPlusCircle size={24} /> },
-    { name: "Book Requests", path: "requests", icon: <FiClipboard size={24} /> },
-    { name: "Manage Returns", path: "returns", icon: <FiPackage size={24} /> },
-    { name: "Reports", path: "reports", icon: <FiSettings size={24} /> },
+    { name: "Manage Books", path: "manage-books", icon: <FiBook /> },
+    { name: "Add Book", path: "add-book", icon: <FiPlusCircle /> },
+    { name: "Book Requests", path: "requests", icon: <FiClipboard /> },
+    { name: "Manage Returns", path: "returns", icon: <FiPackage /> },
+    { name: "Reports", path: "reports", icon: <FiSettings /> },
   ];
 
   return (
-    <div className="flex flex-1 min-h-screen">
+    <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <div
-        className={`bg-gray-800 text-white transition-all duration-300 ${
-          sidebarOpen ? "w-64" : "w-20"
-        }`}
+      <aside
+        className={`bg-white border-r shadow-sm transition-all duration-300
+        ${sidebarOpen ? "w-64" : "w-20"}`}
       >
-        <div className="p-4 flex justify-between items-center">
-          {sidebarOpen && <h2 className="text-xl font-bold">Librarian Panel</h2>}
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 h-16 border-b">
+          {sidebarOpen && (
+            <h2 className="text-lg font-bold text-gray-800">
+              Librarian Panel
+            </h2>
+          )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 bg-gray-700 rounded"
+            className="p-2 rounded hover:bg-gray-200 text-gray-700"
           >
-            {sidebarOpen ? "◀" : "▶"}
+            <FiMenu size={20} />
           </button>
         </div>
 
-        <ul className="mt-6 space-y-2">
+        {/* Links */}
+        <ul className="mt-4 space-y-1 px-2">
           {links.map((link) => (
             <li key={link.name}>
               <NavLink
                 to={link.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 p-2 rounded hover:bg-gray-700 transition ${
-                    isActive ? "bg-gray-600" : ""
+                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition
+                  ${
+                    isActive
+                      ? "bg-blue-100 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }`
                 }
               >
-                {link.icon}
+                <span className="text-lg">{link.icon}</span>
                 {sidebarOpen && <span>{link.name}</span>}
               </NavLink>
             </li>
           ))}
         </ul>
-      </div>
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-1 p-5 bg-gray-50 min-h-screen">
+      <main className="flex-1 p-6">
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 }

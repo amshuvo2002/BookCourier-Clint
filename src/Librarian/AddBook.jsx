@@ -1,34 +1,84 @@
 import { useState } from "react";
 import UseAxious from "../Hooks/UseAxious";
-
+import Swal from "sweetalert2";
 
 export default function AddBook() {
   const axiosSecure = UseAxious();
-  const [info, setInfo] = useState({ title: "", author: "", price: "", stock: "" });
+  const [info, setInfo] = useState({
+    title: "",
+    author: "",
+    price: "",
+    stock: ""
+  });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    axiosSecure.post("/books", info).then(() => alert("Book Added!"));
+
+    try {
+      const res = await axiosSecure.post("/books", info);
+
+      if (res.data.insertedId) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Book added successfully",
+          confirmButtonColor: "#2563eb",
+        });
+
+        // optional: form reset
+        setInfo({ title: "", author: "", price: "", stock: "" });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "Failed to add book",
+        confirmButtonColor: "#dc2626",
+      });
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
+    <form onSubmit={handleSubmit} className="space-y-3 text-black">
       <h1 className="text-xl font-bold">Add New Book</h1>
 
-      <input className="input input-bordered w-full" placeholder="Title"
+      <input
+        className="input input-bordered bg-gray-200 w-full"
+        placeholder="Title"
+        value={info.title}
         onChange={(e) => setInfo({ ...info, title: e.target.value })}
-      />
-      <input className="input input-bordered w-full" placeholder="Author"
-        onChange={(e) => setInfo({ ...info, author: e.target.value })}
-      />
-      <input className="input input-bordered w-full" placeholder="Price"
-        onChange={(e) => setInfo({ ...info, price: e.target.value })}
-      />
-      <input className="input input-bordered w-full" placeholder="Stock"
-        onChange={(e) => setInfo({ ...info, stock: e.target.value })}
+        required
       />
 
-      <button className="btn btn-primary">Add</button>
+      <input
+        className="input input-bordered bg-gray-200 w-full"
+        placeholder="Author"
+        value={info.author}
+        onChange={(e) => setInfo({ ...info, author: e.target.value })}
+        required
+      />
+
+      <input
+        type="number"
+        className="input input-bordered bg-gray-200 w-full"
+        placeholder="Price"
+        value={info.price}
+        onChange={(e) => setInfo({ ...info, price: e.target.value })}
+        required
+      />
+
+      <input
+        type="number"
+        className="input input-bordered bg-gray-200 w-full"
+        placeholder="Stock"
+        value={info.stock}
+        onChange={(e) => setInfo({ ...info, stock: e.target.value })}
+        required
+      />
+
+      <button className="btn btn-primary w-full">
+        Add Book
+      </button>
     </form>
   );
 }

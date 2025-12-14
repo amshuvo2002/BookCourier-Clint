@@ -21,7 +21,7 @@ const RequestDelivery = () => {
             phone: form.phone.value,
             address: form.address.value,
             bookTitle: form.bookName.value,
-            price: form.price.value || "N/A", // <-- price field added
+            price: form.price.value ? Number(form.price.value) : 0, // ✅ fixed
             orderDate: new Date(),
             status: "pending",
             paymentStatus: "unpaid",
@@ -30,9 +30,11 @@ const RequestDelivery = () => {
         try {
             const { data } = await axiosSecure.post("/orders", orderData);
 
-            if (data.insertedId) {
+            if (data.orderId) { // ✅ backend response check fixed
                 Swal.fire("Success!", "Your delivery request has been placed!", "success");
                 form.reset();
+            } else {
+                Swal.fire("Error!", "Order not created!", "error");
             }
         } catch (error) {
             Swal.fire("Error!", "Something went wrong!", "error");

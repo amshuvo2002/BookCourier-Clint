@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router";
 import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
 import { Authcontext } from "../Context/Authcontext";
 import UseAxious from "../Hooks/UseAxious";
 
@@ -92,6 +93,7 @@ const DashboardLayout = () => {
           </ul>
         </div>
       </div>
+      <Footer></Footer>
     </div>
   );
 };

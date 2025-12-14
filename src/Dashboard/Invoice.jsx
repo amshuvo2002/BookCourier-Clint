@@ -58,8 +58,12 @@ export default function Invoices() {
     if (!confirm.isConfirmed) return;
 
     try {
-      await axiosSecure.delete(`/orders/${id}`); // backend DELETE request
-      setInvoices((prev) => prev.filter((inv) => inv._id !== id)); // frontend update
+      // Backend DELETE request
+      await axiosSecure.delete(`/orders/id/${id}`); 
+
+      // Frontend: remove deleted invoice instantly
+      setInvoices((prev) => prev.filter((inv) => inv._id === id ? false : true));
+
       Swal.fire("Deleted!", "Invoice has been deleted.", "success");
     } catch (err) {
       console.error(err);
@@ -80,7 +84,7 @@ export default function Invoices() {
             <th className="border p-2">Amount</th>
             <th className="border p-2">Date</th>
             <th className="border p-2">Book Name</th>
-            <th className="border p-2">Action</th> {/* New column */}
+            <th className="border p-2">Action</th>
           </tr>
         </thead>
 

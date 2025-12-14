@@ -73,7 +73,7 @@ export default function MyOrders() {
   };
 
   const handlePay = (id) => {
-    navigate(`/dashboard/my-orders/payment/${id}`);
+    navigate(`/dashboard/user/my-orders/payment/${id}`);
   };
 
   if (loading) return <p className="text-center mt-10">Loading orders...</p>;
