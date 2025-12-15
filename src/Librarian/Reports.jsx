@@ -11,7 +11,7 @@ export default function Reports() {
   }, []);
 
   return (
-    <div>
+    <div className="grid grid-cols-1">
       <h1 className="text-2xl font-bold mb-4">Reports</h1>
 
       <div className="stats shadow text-black">

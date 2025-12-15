@@ -58,12 +58,8 @@ export default function Invoices() {
     if (!confirm.isConfirmed) return;
 
     try {
-      // Backend DELETE request
-      await axiosSecure.delete(`/orders/id/${id}`); 
-
-      // Frontend: remove deleted invoice instantly
-      setInvoices((prev) => prev.filter((inv) => inv._id === id ? false : true));
-
+      await axiosSecure.delete(`/orders/id/${id}`);
+      setInvoices((prev) => prev.filter((inv) => inv._id !== id));
       Swal.fire("Deleted!", "Invoice has been deleted.", "success");
     } catch (err) {
       console.error(err);
@@ -77,52 +73,94 @@ export default function Invoices() {
     <div className="text-black max-w-6xl mx-auto py-10 px-4">
       <h1 className="text-2xl font-bold mb-6">Invoices</h1>
 
-      <table className="w-full border text-left">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border p-2">Payment ID</th>
-            <th className="border p-2">Amount</th>
-            <th className="border p-2">Date</th>
-            <th className="border p-2">Book Name</th>
-            <th className="border p-2">Action</th>
-          </tr>
-        </thead>
+      {/* Desktop Table */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full border text-left min-w-[600px]">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border p-2">Payment ID</th>
+              <th className="border p-2">Amount</th>
+              <th className="border p-2">Date</th>
+              <th className="border p-2">Book Name</th>
+              <th className="border p-2">Action</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          {invoices.length > 0 ? (
-            invoices.map((invoice) => (
-              <tr key={invoice._id} className="hover:bg-gray-100">
-                <td className="border p-2">{invoice.paymentId || "N/A"}</td>
-                <td className="border p-2">${invoice.price || "N/A"}</td>
-                <td className="border p-2">
-                  {invoice.paidAt
-                    ? new Date(invoice.paidAt).toLocaleDateString()
-                    : invoice.orderDate
-                    ? new Date(invoice.orderDate).toLocaleDateString()
-                    : invoice.createdAt
-                    ? new Date(invoice.createdAt).toLocaleDateString()
-                    : "N/A"}
-                </td>
-                <td className="border p-2">{invoice.bookTitle || "N/A"}</td>
-                <td className="border p-2">
-                  <button
-                    onClick={() => handleDelete(invoice._id)}
-                    className="px-3 py-1 bg-red-500 text-white rounded"
-                  >
-                    Delete
-                  </button>
+          <tbody>
+            {invoices.length > 0 ? (
+              invoices.map((invoice) => (
+                <tr key={invoice._id} className="hover:bg-gray-100">
+                  <td className="border p-2">{invoice.paymentId || "N/A"}</td>
+                  <td className="border p-2">${invoice.price || "N/A"}</td>
+                  <td className="border p-2">
+                    {invoice.paidAt
+                      ? new Date(invoice.paidAt).toLocaleDateString()
+                      : invoice.orderDate
+                      ? new Date(invoice.orderDate).toLocaleDateString()
+                      : invoice.createdAt
+                      ? new Date(invoice.createdAt).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+                  <td className="border p-2">{invoice.bookTitle || "N/A"}</td>
+                  <td className="border p-2">
+                    <button
+                      onClick={() => handleDelete(invoice._id)}
+                      className="px-3 py-1 bg-red-500 text-white rounded"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center p-4">
+                  No invoices found.
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="5" className="text-center p-4">
-                No invoices found.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Accordion */}
+      <div className="md:hidden space-y-4">
+        {invoices.length === 0 && (
+          <p className="text-center py-4">No invoices found.</p>
+        )}
+
+        {invoices.map((invoice) => (
+          <div key={invoice._id} className="border rounded shadow p-3 bg-white">
+            <div className="flex justify-between items-center">
+              <span className="font-semibold">{invoice.bookTitle || "N/A"}</span>
+              <span className="text-gray-800">${invoice.price || "N/A"}</span>
+            </div>
+
+            <div className="mt-2 text-sm text-gray-600">
+              <p><strong>Payment ID:</strong> {invoice.paymentId || "N/A"}</p>
+              <p>
+                <strong>Date:</strong>{" "}
+                {invoice.paidAt
+                  ? new Date(invoice.paidAt).toLocaleDateString()
+                  : invoice.orderDate
+                  ? new Date(invoice.orderDate).toLocaleDateString()
+                  : invoice.createdAt
+                  ? new Date(invoice.createdAt).toLocaleDateString()
+                  : "N/A"}
+              </p>
+            </div>
+
+            <div className="mt-3">
+              <button
+                onClick={() => handleDelete(invoice._id)}
+                className="w-full px-3 py-1 bg-red-500 text-white rounded"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

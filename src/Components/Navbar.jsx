@@ -10,14 +10,15 @@ const Navbar = () => {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch role from backend
+  // Fetch role
   useEffect(() => {
     const fetchRole = async () => {
       if (user?.email) {
         try {
-          // Full backend URL ensure
-          const res = await axios.get(`http://localhost:3000/api/getRole?email=${user.email}`);
-          setRole(res.data.role || null); 
+          const res = await axios.get(
+            `http://localhost:3000/api/getRole?email=${user.email}`
+          );
+          setRole(res.data.role || null);
         } catch (err) {
           console.error("Failed to fetch role:", err);
           setRole(null);
@@ -41,12 +42,11 @@ const Navbar = () => {
     );
   }
 
-  // Role-based dashboard link
-  let dashboardLink = ""; 
- if (role === "admin") dashboardLink = "/dashboard/admin/users";
-else if (role === "librarian") dashboardLink = "/dashboard/librarian";
-else if (role === "user") dashboardLink = "/dashboard/user/my-orders";
-
+  // Dashboard link by role
+  let dashboardLink = "";
+  if (role === "admin") dashboardLink = "/dashboard/admin/users";
+  else if (role === "librarian") dashboardLink = "/dashboard/librarian/manage-books";
+  else if (role === "user") dashboardLink = "/dashboard/user/my-orders";
 
   return (
     <div className="navbar bg-gray-300 text-black shadow-sm">
@@ -64,14 +64,24 @@ else if (role === "user") dashboardLink = "/dashboard/user/my-orders";
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
             </svg>
           </div>
-          <ul
-            tabIndex="-1"
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
-          >
-            <Link to={"/"}><h1 className="hover:underline">Home</h1></Link>
-            <Link to={"/books"}><h1 className="hover:underline">Books</h1></Link>
-            <Link to={"/request-delivery"}><h1 className="hover:underline">Request Delivery</h1></Link>
-            {user && dashboardLink && <Link to={dashboardLink}><h1 className="hover:underline">Dashboard</h1></Link>}
+
+          {/* Mobile Menu */}
+          <ul className="menu menu-sm dropdown-content bg-white bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+            <Link to="/"><h1 className="hover:underline">Home</h1></Link>
+            <Link to="/books"><h1 className="hover:underline">Books</h1></Link>
+
+            {/* USER ONLY */}
+            {role === "user" && (
+              <Link to="/request-delivery">
+                <h1 className="hover:underline">Request Delivery</h1>
+              </Link>
+            )}
+
+            {user && dashboardLink && (
+              <Link to={dashboardLink}>
+                <h1 className="hover:underline">Dashboard</h1>
+              </Link>
+            )}
           </ul>
         </div>
 
@@ -81,17 +91,28 @@ else if (role === "user") dashboardLink = "/dashboard/user/my-orders";
         </div>
       </div>
 
-      {/* Navbar Center */}
+      {/* Navbar Center (Desktop) */}
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 gap-4">
-          <Link to={"/"}><h1 className="hover:underline">Home</h1></Link>
-          <Link to={"/books"}><h1 className="hover:underline">Books</h1></Link>
-          <Link to={"/request-delivery"}><h1 className="hover:underline">Request Delivery</h1></Link>
-          {user && dashboardLink && <Link to={dashboardLink}><h1 className="hover:underline">Dashboard</h1></Link>}
+          <Link to="/"><h1 className="hover:underline">Home</h1></Link>
+          <Link to="/books"><h1 className="hover:underline">Books</h1></Link>
+
+          {/* USER ONLY */}
+          {role === "user" && (
+            <Link to="/request-delivery">
+              <h1 className="hover:underline">Request Delivery</h1>
+            </Link>
+          )}
+
+          {user && dashboardLink && (
+            <Link to={dashboardLink}>
+              <h1 className="hover:underline">Dashboard</h1>
+            </Link>
+          )}
         </ul>
       </div>
 
-      {/* Theme Toggle */}
+      {/* Theme */}
       <div><ThemeToggle /></div>
 
       {/* Navbar End */}
@@ -104,19 +125,26 @@ else if (role === "user") dashboardLink = "/dashboard/user/my-orders";
                 className="w-10 h-10 rounded-full border"
                 alt="profile"
               />
-              <span className="hidden md:inline font-semibold">{user.displayName || "User"}</span>
+              <span className="hidden md:inline font-semibold">
+                {user.displayName || "User"}
+              </span>
             </div>
 
-            <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-52 shadow">
+            <ul className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-52 shadow">
               <li>
-                <button onClick={logout} className="text-red-500 font-bold w-full text-left">
+                <button
+                  onClick={logout}
+                  className="text-red-500 font-bold w-full text-left"
+                >
                   Logout
                 </button>
               </li>
             </ul>
           </div>
         ) : (
-          <a className="btn"><Link to={"/login"}>Login</Link></a>
+          <a className="btn">
+            <Link to="/login">Login</Link>
+          </a>
         )}
       </div>
     </div>

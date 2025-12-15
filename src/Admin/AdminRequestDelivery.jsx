@@ -24,6 +24,7 @@ export default function AdminRequestDelivery() {
     fetchRequests();
   }, []);
 
+  // ---------------- Update Status ----------------
   const handleUpdateStatus = async (id, status) => {
     const confirmText = status === "approved" ? "approve" : "reject";
     const result = await Swal.fire({
@@ -35,36 +36,68 @@ export default function AdminRequestDelivery() {
       confirmButtonText: `Yes, ${confirmText}`,
     });
 
-    if (result.isConfirmed) {
-      try {
-        const res = await axiosSecure.patch(
-          `/delivery-requests/${status}/${id}`
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await axiosSecure.patch(
+        `/delivery-requests/${status}/${id}`
+      );
+
+      if (res.data.modifiedCount > 0) {
+        Swal.fire(
+          status === "approved" ? "Approved!" : "Rejected!",
+          `Delivery request ${status}.`,
+          status === "approved" ? "success" : "error"
         );
-        if (res.data.modifiedCount > 0) {
-          Swal.fire(
-            status === "approved" ? "Approved!" : "Rejected!",
-            `Delivery request ${status}.`,
-            status === "approved" ? "success" : "error"
-          );
-          // update local state
-          setRequests((prev) =>
-            prev.map((item) =>
-              item._id === id ? { ...item, status } : item
-            )
-          );
-        }
-      } catch (err) {
-        console.error(err);
-        Swal.fire("Error", "Failed to update delivery request", "error");
+
+        setRequests(prev =>
+          prev.map(item =>
+            item._id === id ? { ...item, status } : item
+          )
+        );
       }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to update delivery request", "error");
     }
   };
 
-  if (loading) return <p className="text-center py-10 font-bold">Loading...</p>;
+  // ---------------- DELETE Request ----------------
+  const handleDelete = async (id) => {
+    const confirm = await Swal.fire({
+      title: "Delete Request?",
+      text: "This delivery request will be permanently deleted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Yes, Delete",
+      cancelButtonText: "No",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const res = await axiosSecure.delete(`/delivery-requests/${id}`);
+
+      if (res.data.deletedCount > 0) {
+        Swal.fire("Deleted!", "Delivery request deleted successfully", "success");
+
+        // ❌ UI থেকেও remove
+        setRequests(prev => prev.filter(item => item._id !== id));
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to delete delivery request", "error");
+    }
+  };
+
+  if (loading)
+    return <p className="text-center py-10 font-bold">Loading...</p>;
 
   return (
     <div className="p-6 text-black">
       <h2 className="text-2xl font-bold mb-5">📦 Admin Delivery Requests</h2>
+
       <div className="overflow-x-auto">
         <table className="table w-full border">
           <thead className="bg-gray-100 text-black">
@@ -77,6 +110,7 @@ export default function AdminRequestDelivery() {
               <th className="text-center">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {requests.length === 0 && (
               <tr>
@@ -85,12 +119,14 @@ export default function AdminRequestDelivery() {
                 </td>
               </tr>
             )}
+
             {requests.map((r, index) => (
               <tr key={r._id}>
                 <td>{index + 1}</td>
                 <td>{r.user || r.userEmail || "Unknown"}</td>
                 <td>{r.book || r.bookName || "Unknown"}</td>
                 <td>{r.address || "No address provided"}</td>
+
                 <td>
                   <span
                     className={`px-2 py-1 rounded text-white ${
@@ -104,20 +140,30 @@ export default function AdminRequestDelivery() {
                     {r.status}
                   </span>
                 </td>
+
                 <td className="text-center flex justify-center gap-2">
                   <button
                     onClick={() => handleUpdateStatus(r._id, "approved")}
                     disabled={r.status !== "pending"}
-                    className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                    className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
                   >
                     Approve
                   </button>
+
                   <button
                     onClick={() => handleUpdateStatus(r._id, "rejected")}
                     disabled={r.status !== "pending"}
-                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
                   >
                     Reject
+                  </button>
+
+                  {/* DELETE */}
+                  <button
+                    onClick={() => handleDelete(r._id)}
+                    className="px-3 py-1 bg-gray-700 text-white rounded hover:bg-black"
+                  >
+                    Delete
                   </button>
                 </td>
               </tr>

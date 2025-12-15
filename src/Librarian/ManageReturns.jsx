@@ -64,7 +64,7 @@ export default function ManageReturns() {
     return <p className="text-center mt-10 text-red-500">No return requests found</p>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 text-black">
       <h1 className="text-2xl font-bold mb-6">📚 Manage Returns</h1>
 
       <div className="space-y-4">
@@ -93,7 +93,7 @@ export default function ManageReturns() {
             {r.status !== "received" && (
               <button
                 onClick={() => handleReceive(r._id)}
-                className="btn btn-sm mt-2 md:mt-0 bg-green-100 text-green-700 hover:bg-green-200"
+                className="btn ml-10 btn-sm mt-2 md:mt-0 bg-green-100 text-green-700 hover:bg-green-200"
               >
                 Mark as Received
               </button>

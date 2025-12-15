@@ -59,7 +59,7 @@ const AdminAddBook = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto text-black bg-white p-8 shadow rounded">
+    <div className="max-w-xl mx-auto text-black bg-white md:p-8 p-0 shadow rounded">
       <h2 className="text-2xl font-semibold mb-6">➕ Add New Book</h2>
 
       <form onSubmit={handleAddBook} className="space-y-4">

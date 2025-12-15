@@ -62,12 +62,13 @@ export default function ManageBooks() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm">
+    <div className="bg-white text-black md:p-6 p-0 rounded-xl shadow-sm">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
         Manage Books
       </h1>
 
-      <div className="overflow-x-auto">
+      {/* Desktop Table */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full border border-gray-200">
           <thead className="bg-gray-100">
             <tr className="text-sm text-gray-700">
@@ -137,6 +138,57 @@ export default function ManageBooks() {
             No books found
           </p>
         )}
+      </div>
+
+      {/* Mobile Accordion */}
+      <div className="md:hidden space-y-4">
+        {books.length === 0 && (
+          <p className="text-center py-4 text-gray-500">No books found.</p>
+        )}
+
+        {books.map(book => (
+          <div key={book._id} className="border rounded shadow p-4 bg-white">
+            <div className="flex justify-between items-center">
+              <span className="font-semibold">{book.title}</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium
+                ${
+                  book.status === "published"
+                    ? "bg-green-100 text-green-600"
+                    : "bg-yellow-100 text-yellow-600"
+                }`}>
+                {book.status}
+              </span>
+            </div>
+
+            <div className="mt-2 text-sm text-gray-600">
+              <p><strong>Author:</strong> {book.author}</p>
+              <p><strong>Price:</strong> ৳{book.price}</p>
+            </div>
+
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={() => toggleStatus(book._id, book.status)}
+                className={`flex-1 px-3 py-1 text-sm rounded-md
+                ${
+                  book.status === "published"
+                    ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+                    : "bg-green-100 text-green-700 hover:bg-green-200"
+                }`}
+              >
+                {book.status === "published" ? "Unpublish" : "Publish"}
+              </button>
+
+              {role === "admin" && (
+                <button
+                  onClick={() => handleDelete(book._id)}
+                  className="flex-1 px-3 py-1 text-sm rounded-md bg-red-100 text-red-600 hover:bg-red-200"
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

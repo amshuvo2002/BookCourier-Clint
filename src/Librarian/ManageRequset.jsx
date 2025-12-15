@@ -61,7 +61,7 @@ export default function ManageRequests() {
   if (loading) return <p className="text-center mt-10">Loading...</p>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 text-black">
       <h1 className="text-2xl font-bold mb-6">📚 Book Delivery Requests</h1>
 
       {requests.length === 0 && (
@@ -72,7 +72,7 @@ export default function ManageRequests() {
         {requests.map(r => (
           <div
             key={r._id}
-            className="p-4 bg-gray-100 rounded-lg shadow flex flex-col md:flex-row md:justify-between md:items-center"
+            className="md:p-4 p-0 bg-gray-100 rounded-lg shadow flex flex-col md:flex-row md:justify-between md:items-center"
           >
             <div className="space-y-1">
               <p><b>User:</b> {r.user || r.email || "N/A"}</p>

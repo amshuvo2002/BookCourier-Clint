@@ -54,10 +54,6 @@ const RequestDelivery = () => {
                     <input type="text" name="bookName" required className="w-full p-2 border rounded mt-1" />
                 </div>
 
-                <div>
-                    <label className="font-medium">Price</label>
-                    <input type="number" name="price" required className="w-full p-2 border rounded mt-1" />
-                </div>
 
                 <div>
                     <label className="font-medium">Name</label>

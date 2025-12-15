@@ -66,7 +66,7 @@ export default function PaymentPage() {
   if (!order) return <p className="text-center mt-10">Order not found</p>;
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-gray-200 mt-10 rounded shadow">
+    <div className="max-w-md mx-auto p-6 bg-gray-200 mt-10 text-black rounded shadow">
       <h2 className="text-xl font-bold mb-4">Payment Page</h2>
 
       <p className="mb-2">

@@ -9,7 +9,7 @@ const AdminOrders = () => {
 
   const axiosSecure = UseAxious();
 
-  // Load all orders
+  // ---------------- Load all orders ----------------
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -27,7 +27,7 @@ const AdminOrders = () => {
     fetchOrders();
   }, []);
 
-  // Update Order Status
+  // ---------------- Update Order Status ----------------
   const handleStatusUpdate = async (id, currentStatus) => {
     let nextStatus;
     if (currentStatus === "pending") nextStatus = "shipped";
@@ -35,12 +35,16 @@ const AdminOrders = () => {
     else return;
 
     try {
-      const res = await axiosSecure.patch(`/orders/status/${id}`, { status: nextStatus });
+      const res = await axiosSecure.patch(`/orders/status/${id}`, {
+        status: nextStatus,
+      });
 
       if (res.data.modifiedCount > 0) {
         Swal.fire("Success!", `Order status updated to ${nextStatus}`, "success");
         setOrders(prev =>
-          prev.map(order => (order._id === id ? { ...order, status: nextStatus } : order))
+          prev.map(order =>
+            order._id === id ? { ...order, status: nextStatus } : order
+          )
         );
       }
     } catch (err) {
@@ -49,7 +53,7 @@ const AdminOrders = () => {
     }
   };
 
-  // Cancel Order
+  // ---------------- Cancel Order ----------------
   const handleCancel = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -68,7 +72,9 @@ const AdminOrders = () => {
       if (res.data.modifiedCount > 0) {
         Swal.fire("Cancelled!", "Order cancelled successfully", "success");
         setOrders(prev =>
-          prev.map(order => (order._id === id ? { ...order, status: "cancelled" } : order))
+          prev.map(order =>
+            order._id === id ? { ...order, status: "cancelled" } : order
+          )
         );
       }
     } catch (err) {
@@ -77,20 +83,49 @@ const AdminOrders = () => {
     }
   };
 
+  // ---------------- DELETE Order ----------------
+  const handleDelete = async (id) => {
+    const confirm = await Swal.fire({
+      title: "Delete Order?",
+      text: "This order will be permanently deleted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Yes, Delete",
+      cancelButtonText: "No",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const res = await axiosSecure.delete(`/orders/${id}`);
+
+      if (res.data.deletedCount > 0) {
+        Swal.fire("Deleted!", "Order deleted successfully", "success");
+
+        // ❌ UI থেকেও remove
+        setOrders(prev => prev.filter(order => order._id !== id));
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to delete order", "error");
+    }
+  };
+
   return (
-    <div className="p-5 text-black">
+    <div className="md:p-5 p-0 text-black">
       <h2 className="text-2xl font-semibold mb-4">📦 All Orders</h2>
 
       <div className="overflow-x-auto shadow bg-white text-black rounded">
         <table className="table w-full">
-          <thead className="bg-gray-200">
+          <thead className="bg-gray-200 text-black">
             <tr>
               <th>#</th>
               <th>Book</th>
               <th>User</th>
               <th>Order Date</th>
               <th>Status</th>
-              <th>Payment Status</th>
+              <th>Payment</th>
               <th className="text-center">Actions</th>
             </tr>
           </thead>
@@ -149,7 +184,9 @@ const AdminOrders = () => {
                     <td>
                       <span
                         className={`px-2 py-1 rounded text-white ${
-                          paymentStatus === "paid" ? "bg-green-600" : "bg-red-600"
+                          paymentStatus === "paid"
+                            ? "bg-green-600"
+                            : "bg-red-600"
                         }`}
                       >
                         {paymentStatus}
@@ -162,18 +199,26 @@ const AdminOrders = () => {
                           onClick={() => handleStatusUpdate(_id, status)}
                           className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
                         >
-                          Next Status
+                          Next
                         </button>
                       )}
 
                       {status !== "cancelled" && (
                         <button
                           onClick={() => handleCancel(_id)}
-                          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                          className="px-3 py-1 bg-orange-600 text-white rounded hover:bg-orange-700"
                         >
                           Cancel
                         </button>
                       )}
+
+                      {/* DELETE */}
+                      <button
+                        onClick={() => handleDelete(_id)}
+                        className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 );
