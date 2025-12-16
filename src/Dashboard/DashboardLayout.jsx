@@ -53,6 +53,7 @@ const DashboardLayout = () => {
       { name: "My Profile", path: "/dashboard/profile" },
       { name: "My Orders", path: "/dashboard/my-orders" },
       { name: "Invoices", path: "/dashboard/invoices" },
+      { name: "WishList", path: "/dashboard/my-wishlist" },
     ],
     librarian: [
       { name: "Dashboard", path: "/dashboard/librarian/dashboard" },

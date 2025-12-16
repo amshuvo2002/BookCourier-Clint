@@ -13,11 +13,10 @@ export default function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const links = [
-    { name: "Manage Books", path: "manage-books", icon: <FiBook /> },
+    { name: "Manage My Books", path: "manage-books", icon: <FiBook /> },
     { name: "Add Book", path: "add-book", icon: <FiPlusCircle /> },
-    { name: "Book Requests", path: "requests", icon: <FiClipboard /> },
-    { name: "Manage Returns", path: "returns", icon: <FiPackage /> },
-    { name: "Reports", path: "reports", icon: <FiSettings /> },
+    { name: "Book Orders", path: "requests", icon: <FiClipboard /> },
+   
   ];
 
   return (

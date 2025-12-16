@@ -8,6 +8,7 @@ import {
   FiFileText,
   FiMenu
 } from "react-icons/fi";
+import { FcTodoList } from "react-icons/fc";
 
 const MyDashboard = () => {
   const { user, loading: authLoading } = useContext(Authcontext);
@@ -47,6 +48,7 @@ const MyDashboard = () => {
 
   const userLinks = [
     { name: "Profile", path: "/dashboard/user/profile", icon: <FiUser /> },
+    { name: "Wish-list", path: "/dashboard/user/wish-list", icon: <FcTodoList /> },
     { name: "My Orders", path: "/dashboard/user/my-orders", icon: <FiShoppingCart /> },
     { name: "Invoices", path: "/dashboard/user/invoices", icon: <FiFileText /> },
   ];

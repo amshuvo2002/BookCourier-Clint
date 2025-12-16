@@ -57,10 +57,10 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
       <aside
-        className={`bg-white border-r shadow-sm transition-all duration-300
+        className={`bg-white border-r shadow-sm transition-all duration-300 h-full
         ${sidebarOpen ? "w-64" : "w-20"}`}
       >
         <div className="flex items-center justify-between px-4 h-16 border-b">
@@ -100,7 +100,7 @@ const AdminDashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6">
+      <main className="flex-1 h-full overflow-hidden">
         <Outlet />
       </main>
     </div>

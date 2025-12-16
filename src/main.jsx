@@ -28,10 +28,8 @@ import UserDashboard from "./Dashboard/UserDashboard.jsx";
 import LibrarianDashboard from "./Librarian/LibrarianDashboard.jsx";
 import ManageBooks from "./Librarian/ManageBooks.jsx";
 import AddBook from "./Librarian/AddBook.jsx";
-import EditBook from "./Librarian/EditBook.jsx";
 import ManageRequests from "./Librarian/ManageRequset.jsx";
-import ManageReturns from "./Librarian/ManageReturns.jsx";
-import Reports from "./Librarian/Reports.jsx";
+
 
 // Admin Pages
 import AdminDashboard from "./Admin/AdminDashborard.jsx";
@@ -45,6 +43,7 @@ import AdminRequestDelivery from "./Admin/AdminRequestDelivery.jsx";
 import Authprovider from "./Context/Authprovider.jsx";
 import PrivateRoute from "./PrivetRouts/PrivetRoute.jsx";
 import "leaflet/dist/leaflet.css";
+import MyWishlist from "./Dashboard/MyWishlist.jsx";
 
 
 const router = createBrowserRouter([
@@ -100,6 +99,7 @@ const router = createBrowserRouter([
       { path: "profile", element: <MyProfile /> },
       { path: "my-orders", element: <MyOrders /> },
       { path: "invoices", element: <Invoices /> },
+      { path: "wish-list", element: <MyWishlist></MyWishlist> },
       { path: "my-orders/payment/:id", element: <PaymentPage /> },
         ]
       },
@@ -116,10 +116,7 @@ const router = createBrowserRouter([
           { path: "dashboard", element: <ManageBooks /> },
           { path: "manage-books", element: <ManageBooks /> },
           { path: "add-book", element: <AddBook /> },
-          { path: "edit-book/:id", element: <EditBook /> },
           { path: "requests", element: <ManageRequests /> },
-          { path: "returns", element: <ManageReturns /> },
-          { path: "reports", element: <Reports /> },
         ],
       },
 

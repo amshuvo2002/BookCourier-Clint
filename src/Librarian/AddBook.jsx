@@ -39,7 +39,7 @@ export default function AddBook() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 text-black">
+    <form onSubmit={handleSubmit} className="space-y-3 md:p-4 p-0 text-black">
       <h1 className="text-xl font-bold">Add New Book</h1>
 
       <input

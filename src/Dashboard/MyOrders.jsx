@@ -75,6 +75,43 @@ export default function MyOrders() {
     navigate(`/dashboard/user/my-orders/payment/${id}`);
   };
 
+  const handleReview = async (order) => {
+    const { value: formValues } = await Swal.fire({
+      title: 'Add Review',
+      html:
+        '<input id="swal-input1" class="swal2-input" type="number" placeholder="Rating 1-5" min="1" max="5">' +
+        '<textarea id="swal-input2" class="swal2-textarea" placeholder="Comment"></textarea>',
+      focusConfirm: false,
+      preConfirm: () => {
+        const rating = document.getElementById('swal-input1').value;
+        const comment = document.getElementById('swal-input2').value;
+        if (!rating || !comment) throw new Error("Fill all fields");
+        return { rating, comment };
+      }
+    });
+
+    if (!formValues) return;
+
+    try {
+      // backend expects: { bookId, email, rating, comment }
+      await axiosSecure.post("/reviews", {
+        bookId: order.bookId,
+        email: user.email,
+        rating: formValues.rating,
+        comment: formValues.comment,
+      });
+
+      setOrders(prev =>
+        prev.map(o =>
+          o._id === order._id ? { ...o, review: formValues } : o
+        )
+      );
+      Swal.fire('Success!', 'Review submitted', 'success');
+    } catch (err) {
+      Swal.fire('Error!', 'Failed to submit review', 'error');
+    }
+  };
+
   if (loading) return <p className="text-center mt-10">Loading orders...</p>;
 
   return (
@@ -83,67 +120,84 @@ export default function MyOrders() {
 
       {/* Desktop Table */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full border min-w-[600px]">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="border p-2">Book Name</th>
-              <th className="border p-2">Price</th>
-              <th className="border p-2">Date</th>
-              <th className="border p-2">Cancel</th>
-              <th className="border p-2">Pay Now</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {orders.length === 0 && (
+        <div className="max-h-[60vh] overflow-y-auto border rounded-lg">
+          <table className="w-full min-w-[600px] border-collapse">
+            <thead className="bg-gray-200 sticky top-0 z-10">
               <tr>
-                <td colSpan={5} className="text-center py-4">
-                  No orders found
-                </td>
+                <th className="border p-2 text-left">Book Name</th>
+                <th className="border p-2 text-left">Price</th>
+                <th className="border p-2 text-left">Date</th>
+                <th className="border p-2 text-center">Cancel</th>
+                <th className="border p-2 text-center">Pay Now</th>
+                <th className="border p-2 text-center">Review</th>
               </tr>
-            )}
+            </thead>
 
-            {orders.map((o) => {
-              const isPaid = o.paymentStatus === "paid" || o.status === "success";
-
-              return (
-                <tr key={o._id}>
-                  <td className="border p-2">{o.bookTitle || o.bookName || "N/A"}</td>
-                  <td className="border p-2">
-                    {isPaid ? <span className="text-green-600 font-bold">Paid</span> : `$${o.price}`}
-                  </td>
-                  <td className="border p-2">
-                    {o.orderDate
-                      ? new Date(o.orderDate).toLocaleDateString()
-                      : o.createdAt
-                      ? new Date(o.createdAt).toLocaleDateString()
-                      : "N/A"}
-                  </td>
-                  <td className="border p-2">
-                    {!isPaid && (
-                      <button
-                        onClick={() => handleCancel(o._id)}
-                        className="px-3 py-1 bg-red-500 text-white rounded"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </td>
-                  <td className="border p-2">
-                    {!isPaid && (
-                      <button
-                        onClick={() => handlePay(o._id)}
-                        className="px-3 py-1 bg-green-600 text-white rounded"
-                      >
-                        Pay Now
-                      </button>
-                    )}
+            <tbody>
+              {orders.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="text-center py-4">
+                    No orders found
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              )}
+
+              {orders.map((o) => {
+                const isPaid = o.paymentStatus === "paid" || o.status === "success";
+
+                return (
+                  <tr key={o._id} className="hover:bg-gray-50">
+                    <td className="border p-2">{o.bookTitle || o.bookName || "N/A"}</td>
+                    <td className="border p-2">
+                      {isPaid ? <span className="text-green-600 font-bold">Paid</span> : `$${o.price}`}
+                    </td>
+                    <td className="border p-2">
+                      {o.orderDate
+                        ? new Date(o.orderDate).toLocaleDateString()
+                        : o.createdAt
+                        ? new Date(o.createdAt).toLocaleDateString()
+                        : "N/A"}
+                    </td>
+                    <td className="border p-2 text-center">
+                      {!isPaid && (
+                        <button
+                          onClick={() => handleCancel(o._id)}
+                          className="px-3 py-1 bg-red-500 text-white rounded"
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </td>
+                    <td className="border p-2 text-center">
+                      {!isPaid && (
+                        <button
+                          onClick={() => handlePay(o._id)}
+                          className="px-3 py-1 bg-green-600 text-white rounded"
+                        >
+                          Pay Now
+                        </button>
+                      )}
+                    </td>
+                    <td className="border p-2 text-center">
+                      {o.review ? (
+                        <span>{o.review.rating} ⭐ - {o.review.comment}</span>
+                      ) : (
+                        isPaid && (
+                          <button
+                            onClick={() => handleReview(o)}
+                            className="px-3 py-1 bg-blue-500 text-white rounded"
+                          >
+                            Add Review
+                          </button>
+                        )
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Mobile Accordion */}
@@ -154,6 +208,7 @@ export default function MyOrders() {
 
         {orders.map((o) => {
           const isPaid = o.paymentStatus === "paid" || o.status === "success";
+
           return (
             <div key={o._id} className="border rounded shadow p-3 bg-white">
               <div className="flex justify-between items-center">
@@ -165,24 +220,38 @@ export default function MyOrders() {
 
               <div className="mt-2 text-sm text-gray-600">
                 <p><strong>Date:</strong> {o.orderDate ? new Date(o.orderDate).toLocaleDateString() : o.createdAt ? new Date(o.createdAt).toLocaleDateString() : "N/A"}</p>
+                <p><strong>Status:</strong> {o.status}</p>
+                {o.review && (
+                  <p><strong>Review:</strong> {o.review.rating} ⭐ - {o.review.comment}</p>
+                )}
               </div>
 
-              {!isPaid && (
-                <div className="mt-3 flex gap-2">
+              <div className="mt-3 flex flex-col md:flex-row gap-2">
+                {!isPaid && (
+                  <>
+                    <button
+                      onClick={() => handleCancel(o._id)}
+                      className="flex-1 px-3 py-1 bg-red-500 text-white rounded"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => handlePay(o._id)}
+                      className="flex-1 px-3 py-1 bg-green-600 text-white rounded"
+                    >
+                      Pay Now
+                    </button>
+                  </>
+                )}
+                {isPaid && !o.review && (
                   <button
-                    onClick={() => handleCancel(o._id)}
-                    className="flex-1 px-3 py-1 bg-red-500 text-white rounded"
+                    onClick={() => handleReview(o)}
+                    className="flex-1 px-3 py-1 bg-blue-500 text-white rounded mt-2 md:mt-0"
                   >
-                    Cancel
+                    Add Review
                   </button>
-                  <button
-                    onClick={() => handlePay(o._id)}
-                    className="flex-1 px-3 py-1 bg-green-600 text-white rounded"
-                  >
-                    Pay Now
-                  </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           );
         })}

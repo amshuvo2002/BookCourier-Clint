@@ -45,6 +45,9 @@ export default function Invoices() {
     fetchInvoices();
   }, [user, axiosSecure]);
 
+  // ------------------------
+  // Fixed Delete
+  // ------------------------
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -58,7 +61,10 @@ export default function Invoices() {
     if (!confirm.isConfirmed) return;
 
     try {
-      await axiosSecure.delete(`/orders/id/${id}`);
+      // Fixed endpoint: /orders/:id
+      await axiosSecure.delete(`/orders/${id}`);
+
+      // Remove from state
       setInvoices((prev) => prev.filter((inv) => inv._id !== id));
       Swal.fire("Deleted!", "Invoice has been deleted.", "success");
     } catch (err) {

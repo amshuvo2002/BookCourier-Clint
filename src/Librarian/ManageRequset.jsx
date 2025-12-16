@@ -1,126 +1,139 @@
-import { useEffect, useState } from "react";
-import UseAxious from "../Hooks/UseAxious";
+import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import UseAxious from "../Hooks/UseAxious";
 
-export default function ManageRequests() {
+const LibrarianOrders = () => {
   const axiosSecure = UseAxious();
-  const [requests, setRequests] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ---------------------------
-  // Load all delivery requests
-  // ---------------------------
-  useEffect(() => {
-    axiosSecure.get("/delivery-requests") // <-- backend route fixed
-      .then(res => {
-        setRequests(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, [axiosSecure]);
-
-  // ---------------------------
-  // Update status (approve / reject)
-  // ---------------------------
-  const handleStatus = async (id, status) => {
-    const confirm = await Swal.fire({
-      title: `Are you sure you want to ${status}?`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "Cancel",
-    });
-
-    if (!confirm.isConfirmed) return;
-
+  // ------------------------
+  // Fetch all orders
+  // ------------------------
+  const fetchOrders = async () => {
     try {
-      await axiosSecure.patch(`/delivery-requests/${status}/${id}`); // approve/reject route
-      setRequests(prev =>
-        prev.map(r => (r._id === id ? { ...r, status } : r))
-      );
-
-      Swal.fire({
-        icon: "success",
-        title: `Request ${status}`,
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    } catch (err) {
-      console.error(err);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to update request",
-      });
+      setLoading(true);
+      const res = await axiosSecure.get("/orders");
+      setOrders(res.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  // ------------------------
+  // Cancel order
+  // ------------------------
+  const cancelOrder = async (_id) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You want to cancel this order!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, cancel it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axiosSecure.patch(`/orders/${_id}/status`, { orderStatus: "cancelled" });
+        Swal.fire("Canceled!", "Order has been cancelled.", "success");
+        fetchOrders();
+      } catch (error) {
+        console.error("Error cancelling order:", error);
+      }
+    }
+  };
+
+  // ------------------------
+  // Update status
+  // ------------------------
+  const updateStatus = async (_id, currentStatus) => {
+    let newStatus;
+    if (currentStatus === "pending") newStatus = "shipped";
+    else if (currentStatus === "shipped") newStatus = "delivered";
+    else return;
+
+    try {
+      await axiosSecure.patch(`/orders/${_id}/status`, { orderStatus: newStatus });
+      Swal.fire("Updated!", `Status changed to ${newStatus}`, "success");
+      fetchOrders();
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
+  };
+
+  if (loading) return <p className="text-center text-gray-600">Loading orders...</p>;
 
   return (
-    <div className="p-4 text-black">
-      <h1 className="text-2xl font-bold mb-6">📚 Book Delivery Requests</h1>
-
-      {requests.length === 0 && (
-        <p className="text-red-500 text-center">No requests found</p>
-      )}
-
-      <div className="space-y-4">
-        {requests.map(r => (
-          <div
-            key={r._id}
-            className="md:p-4 p-0 bg-gray-100 rounded-lg shadow flex flex-col md:flex-row md:justify-between md:items-center"
-          >
-            <div className="space-y-1">
-              <p><b>User:</b> {r.user || r.email || "N/A"}</p>
-              <p><b>Book:</b> {r.book || r.bookTitle || "N/A"}</p>
-              <p>
-                <b>Status:</b>{" "}
-                <span
-                  className={`font-semibold ${
-                    r.status === "approved"
-                      ? "text-green-600"
-                      : r.status === "rejected"
-                      ? "text-red-600"
-                      : "text-yellow-600"
-                  }`}
-                >
-                  {r.status || "pending"}
-                </span>
-              </p>
-            </div>
-
-            <div className="mt-3 md:mt-0 flex gap-2">
-              <button
-                disabled={r.status === "approved"}
-                onClick={() => handleStatus(r._id, "approved")}
-                className={`btn btn-sm px-3 py-1 rounded-md transition
-                  ${r.status === "approved"
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-green-100 text-green-700 hover:bg-green-200"}
-                `}
-              >
-                Approve
-              </button>
-
-              <button
-                disabled={r.status === "rejected"}
-                onClick={() => handleStatus(r._id, "rejected")}
-                className={`btn btn-sm px-3 py-1 rounded-md transition
-                  ${r.status === "rejected"
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-red-100 text-red-700 hover:bg-red-200"}
-                `}
-              >
-                Reject
-              </button>
-            </div>
-          </div>
-        ))}
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4 text-center">Librarian Orders</h1>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white rounded shadow">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="py-2 px-4 text-left">Book Title</th>
+              <th className="py-2 px-4 text-left">User</th>
+              <th className="py-2 px-4 text-left">Order Status</th>
+              <th className="py-2 px-4 text-left">Payment Status</th>
+              <th className="py-2 px-4 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order._id} className="border-b hover:bg-gray-50">
+                {/* Book title */}
+                <td className="py-2 px-4">{order.bookTitle || "No Title"}</td>
+                {/* User name */}
+                <td className="py-2 px-4">{order.userName || "Unknown User"}</td>
+                {/* Order Status */}
+                <td className="py-2 px-4 capitalize">
+                  <span
+                    className={`px-2 py-1 rounded text-white ${
+                      order.orderStatus === "pending"
+                        ? "bg-yellow-500"
+                        : order.orderStatus === "shipped"
+                        ? "bg-blue-500"
+                        : order.orderStatus === "delivered"
+                        ? "bg-green-500"
+                        : "bg-red-500"
+                    }`}
+                  >
+                    {order.orderStatus}
+                  </span>
+                </td>
+                {/* Payment Status */}
+                <td className="py-2 px-4 capitalize">{order.paymentStatus}</td>
+                {/* Actions */}
+                <td className="py-2 px-4 space-x-2">
+                  {order.orderStatus !== "delivered" && order.orderStatus !== "cancelled" && (
+                    <button
+                      onClick={() => updateStatus(order._id, order.orderStatus)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                    >
+                      Next Status
+                    </button>
+                  )}
+                  {order.orderStatus !== "cancelled" && (
+                    <button
+                      onClick={() => cancelOrder(order._id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
-}
+};
+
+export default LibrarianOrders;

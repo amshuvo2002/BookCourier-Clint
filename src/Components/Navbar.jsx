@@ -46,7 +46,7 @@ const Navbar = () => {
   let dashboardLink = "";
   if (role === "admin") dashboardLink = "/dashboard/admin/users";
   else if (role === "librarian") dashboardLink = "/dashboard/librarian/manage-books";
-  else if (role === "user") dashboardLink = "/dashboard/user/my-orders";
+  else if (role === "user") dashboardLink = "/dashboard/user/profile";
 
   return (
     <div className="navbar bg-gray-300 text-black shadow-sm">
