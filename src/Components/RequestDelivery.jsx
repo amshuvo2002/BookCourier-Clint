@@ -12,16 +12,22 @@ const RequestDelivery = () => {
         e.preventDefault();
         setLoading(true);
 
+        if (!user) {
+            Swal.fire("Error!", "User not logged in!", "error");
+            setLoading(false);
+            return;
+        }
+
         const form = e.target;
 
         const orderData = {
-            userId: user?.uid,
-            userName: user?.displayName,
-            email: user?.email,
+            userId: user.uid,
+            userName: user.displayName,
+            email: user.email,
             phone: form.phone.value,
             address: form.address.value,
             bookTitle: form.bookName.value,
-            price: form.price.value ? Number(form.price.value) : 0, // ✅ fixed
+            price: parseFloat(form.price.value), // added price
             orderDate: new Date(),
             status: "pending",
             paymentStatus: "unpaid",
@@ -30,7 +36,7 @@ const RequestDelivery = () => {
         try {
             const { data } = await axiosSecure.post("/orders", orderData);
 
-            if (data.orderId) { // ✅ backend response check fixed
+            if (data?.orderId || data?.insertedId) { // backend অনুযায়ী
                 Swal.fire("Success!", "Your delivery request has been placed!", "success");
                 form.reset();
             } else {
@@ -54,6 +60,10 @@ const RequestDelivery = () => {
                     <input type="text" name="bookName" required className="w-full p-2 border rounded mt-1" />
                 </div>
 
+                <div>
+                    <label className="font-medium">Price</label>
+                    <input type="number" name="price" required step="0.01" className="w-full p-2 border rounded mt-1" />
+                </div>
 
                 <div>
                     <label className="font-medium">Name</label>

@@ -8,7 +8,8 @@ export default function AddBook() {
     title: "",
     author: "",
     price: "",
-    stock: ""
+    stock: "",
+    photoURL: "" // ✅ added
   });
 
   const handleSubmit = async (e) => {
@@ -26,7 +27,7 @@ export default function AddBook() {
         });
 
         // optional: form reset
-        setInfo({ title: "", author: "", price: "", stock: "" });
+        setInfo({ title: "", author: "", price: "", stock: "", photoURL: "" });
       }
     } catch (error) {
       Swal.fire({
@@ -74,6 +75,14 @@ export default function AddBook() {
         value={info.stock}
         onChange={(e) => setInfo({ ...info, stock: e.target.value })}
         required
+      />
+
+      <input
+        type="text"
+        className="input input-bordered bg-gray-200 w-full"
+        placeholder="Photo URL"
+        value={info.photoURL}
+        onChange={(e) => setInfo({ ...info, photoURL: e.target.value })}
       />
 
       <button className="btn btn-primary w-full">
