@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import Swal from "sweetalert2";
 import UseAxious from "../Hooks/UseAxious";
 import { Authcontext } from "../Context/Authcontext";
@@ -6,186 +6,232 @@ import { Authcontext } from "../Context/Authcontext";
 const OrdersPage = () => {
   const axiosSecure = UseAxious();
   const { user } = useContext(Authcontext);
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState("user");
+  const [role, setRole] = useState(null);
 
-  // Fetch role
+  const getDisplayStatus = (order) => {
+    if (order.paymentStatus !== "paid") return "unpaid";
+    return order.orderStatus;
+  };
+
+  // ============================
+  // Fetch Role
+  // ============================
   useEffect(() => {
-    if (user?.email) {
-      axiosSecure.get(`/api/getRole?email=${user.email}`)
-        .then((res) => setRole(res.data.role))
-        .catch((err) => console.error(err));
-    }
-  }, [user]);
+    if (!user?.email) return;
 
-  // Fetch orders
-  const fetchOrders = async () => {
+    const fetchRole = async () => {
+      try {
+        const res = await axiosSecure.get(`/api/getRole?email=${user.email}`, {
+          cache: "no-cache", // Axios v1+ supports this
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        });
+        setRole(res.data.role);
+      } catch (err) {
+        console.error("Error fetching role:", err);
+      }
+    };
+
+    fetchRole();
+  }, [user?.email, axiosSecure]);
+
+  // ============================
+  // Fetch Orders - with cache busting
+  // ============================
+  const fetchOrders = useCallback(async () => {
+    if (!user?.email || !role) return;
+
     try {
       setLoading(true);
-      let res;
-      if (role === "librarian") {
-        res = await axiosSecure.get("/orders");
-      } else {
-        res = await axiosSecure.get(`/orders/${user.email}`);
-      }
-      setOrders(res.data);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
+
+      const url =
+        role === "librarian" ? "/orders" : `/orders/${user.email}`;
+
+      const res = await axiosSecure.get(url, {
+        cache: "no-cache",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+        params: { t: Date.now() }, // Cache buster query param
+      });
+
+      setOrders(res.data || []);
+    } catch (err) {
+      console.error("Error fetching orders:", err);
+      Swal.fire("Error", "Failed to load orders", "error");
+      setOrders([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [role, user?.email, axiosSecure]);
 
+  // Fetch when role is ready
   useEffect(() => {
-    if (user?.email) fetchOrders();
-  }, [user, role]);
+    if (role) {
+      fetchOrders();
+    }
+  }, [role, fetchOrders]);
+
+  // ============================
+  // Update Status
+  // ============================
+  const updateOrderStatus = async (id, newStatus) => {
+    try {
+      await axiosSecure.patch(`/orders/${id}/status`, { status: newStatus });
+
+      Swal.fire("Success!", `Order status updated to ${newStatus}`, "success");
+
+      // Refetch to get fresh data from server
+      fetchOrders();
+    } catch (err) {
+      console.error("Update failed:", err);
+      Swal.fire("Error!", "Could not update order status", "error");
+    }
+  };
 
   // Cancel order
   const cancelOrder = async (id) => {
     const result = await Swal.fire({
       title: "Are you sure?",
-      text: "You want to cancel this order!",
+      text: "You want to cancel this order?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, cancel it!",
+      confirmButtonText: "Yes, cancel it",
     });
 
-    if (result.isConfirmed) {
-      try {
-        await axiosSecure.patch(`/orders/${id}/status`, { status: "cancelled" });
-        setOrders(prev => prev.map(o => o._id === id ? { ...o, status: "cancelled" } : o));
-        Swal.fire("Canceled!", "Order has been cancelled.", "success");
-      } catch (error) {
-        console.error("Error cancelling order:", error);
-      }
+    if (!result.isConfirmed) return;
+
+    await updateOrderStatus(id, "cancelled");
+  };
+
+  // Next Status
+  const nextStatus = (order) => {
+    if (order.orderStatus === "pending") {
+      updateOrderStatus(order._id, "shipped");
+    } else if (order.orderStatus === "shipped") {
+      updateOrderStatus(order._id, "delivered");
     }
   };
 
-  // Update status
-  const updateStatus = async (id, currentStatus) => {
-    let newStatus = null;
-
-    switch (currentStatus.toLowerCase()) {
-      case "pending":
-        newStatus = "shipped";
-        break;
-      case "shipped":
-        newStatus = "delivered";
-        break;
-      default:
-        return;
-    }
-
-    try {
-      await axiosSecure.patch(`/orders/${id}/status`, { status: newStatus });
-      setOrders(prev => prev.map(o => (o._id === id ? { ...o, status: newStatus } : o)));
-      Swal.fire("Updated!", `Status changed to ${newStatus}`, "success");
-    } catch (error) {
-      console.error("Error updating status:", error);
-      Swal.fire("Error", "Failed to update status", "error");
-    }
-  };
-
-  // Delete order (only librarian)
+  // Delete Order
   const deleteOrder = async (id) => {
     const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "You want to delete this order permanently!",
+      title: "Delete permanently?",
+      text: "This action cannot be undone",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Yes, delete it",
     });
 
-    if (result.isConfirmed) {
-      try {
-        await axiosSecure.delete(`/orders/${id}`);
-        setOrders(prev => prev.filter(o => o._id !== id));
-        Swal.fire("Deleted!", "Order has been deleted.", "success");
-      } catch (error) {
-        console.error("Error deleting order:", error);
-      }
+    if (!result.isConfirmed) return;
+
+    try {
+      await axiosSecure.delete(`/orders/${id}`);
+      Swal.fire("Deleted!", "Order has been removed", "success");
+      fetchOrders(); // Refresh list
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error!", "Could not delete order", "error");
     }
   };
 
-  if (loading) return <p className="text-center text-gray-600">Loading orders...</p>;
+  if (loading) {
+    return <p className="text-center mt-10 text-gray-600">Loading orders...</p>;
+  }
 
   return (
     <div className="container mx-auto p-4 text-black">
       <h1 className="text-2xl font-bold mb-6 text-center">📦 Orders</h1>
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white rounded shadow">
           <thead className="bg-gray-200">
             <tr>
               <th className="py-2 px-4 text-left">Book</th>
               <th className="py-2 px-4 text-left">User</th>
-              <th className="py-2 px-4 text-left">Order Status</th>
-              <th className="py-2 px-4 text-left">Payment Status</th>
+              <th className="py-2 px-4 text-left">Status</th>
               <th className="py-2 px-4 text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {orders.length === 0 && (
+            {orders.length === 0 ? (
               <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-500">
+                <td colSpan={4} className="text-center py-8 text-gray-500">
                   No orders found
                 </td>
               </tr>
+            ) : (
+              orders.map((order) => {
+                const status = getDisplayStatus(order);
+
+                return (
+                  <tr key={order._id} className="border-b hover:bg-gray-50">
+                    <td className="py-2 px-4">{order.bookTitle}</td>
+                    <td className="py-2 px-4">{order.userName || order.userEmail}</td>
+                    <td className="py-2 px-4">
+                      <span
+                        className={`px-3 py-1 rounded text-white text-sm font-medium ${
+                          status === "unpaid"
+                            ? "bg-gray-500"
+                            : status === "pending"
+                            ? "bg-yellow-500"
+                            : status === "shipped"
+                            ? "bg-blue-500"
+                            : status === "delivered"
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                        }`}
+                      >
+                        {status.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="py-2 px-4 space-x-2">
+                      {/* Next Status - Only for librarian & paid orders */}
+                      {role === "librarian" &&
+                        order.paymentStatus === "paid" &&
+                        ["pending", "shipped"].includes(order.orderStatus) && (
+                          <button
+                            onClick={() => nextStatus(order)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm transition"
+                          >
+                            Next Status
+                          </button>
+                        )}
+
+                      {/* Cancel Button */}
+                      {(role === "librarian" || order.userEmail === user?.email) &&
+                        order.orderStatus !== "cancelled" &&
+                        order.orderStatus !== "delivered" && (
+                          <button
+                            onClick={() => cancelOrder(order._id)}
+                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded text-sm transition"
+                          >
+                            Cancel
+                          </button>
+                        )}
+
+                      {/* Delete - Only librarian */}
+                      {role === "librarian" && (
+                        <button
+                          onClick={() => deleteOrder(order._id)}
+                          className="bg-gray-800 hover:bg-black text-white px-4 py-1.5 rounded text-sm transition"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             )}
-            {orders.map((order) => (
-              <tr key={order._id} className="border-b hover:bg-gray-50">
-                <td className="py-2 px-4">{order.bookTitle || "No Title"}</td>
-                <td className="py-2 px-4">{order.userName || order.email || "Unknown User"}</td>
-                <td className="py-2 px-4">
-                  <span
-                    className={`px-2 py-1 rounded text-white ${
-                      order.status === "pending"
-                        ? "bg-yellow-500"
-                        : order.status === "shipped"
-                        ? "bg-blue-500"
-                        : order.status === "delivered"
-                        ? "bg-green-500"
-                        : "bg-red-500"
-                    }`}
-                  >
-                    {order.status}
-                  </span>
-                </td>
-                <td className="py-2 px-4">
-                  {order.paymentStatus === "paid" ? (
-                    <span className="px-2 py-1 rounded bg-green-500 text-white">Paid</span>
-                  ) : (
-                    <span className="px-2 py-1 rounded bg-red-500 text-white">Unpaid</span>
-                  )}
-                </td>
-                <td className="py-2 px-4 space-x-2">
-                  {role === "librarian" && order.status !== "delivered" && order.status !== "cancelled" && (
-                    <button
-                      onClick={() => updateStatus(order._id, order.status)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    >
-                      Next Status
-                    </button>
-                  )}
-                  {(role === "librarian" || order.email === user.email) && order.status !== "cancelled" && (
-                    <button
-                      onClick={() => cancelOrder(order._id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                  {role === "librarian" && (
-                    <button
-                      onClick={() => deleteOrder(order._id)}
-                      className="bg-gray-700 text-white px-3 py-1 rounded hover:bg-gray-900"
-                    >
-                      Delete
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
           </tbody>
         </table>
       </div>
