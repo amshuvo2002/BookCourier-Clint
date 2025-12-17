@@ -20,52 +20,56 @@ export default function ManageBooks() {
         const bookRes = await axiosSecure.get("/books");
         setBooks(bookRes.data);
       } catch (err) {
-        console.error(err);
+        console.error("Load data error:", err);
       }
     };
     loadData();
   }, [user.email]);
 
-  // ---------------- DELETE ----------------
-  const handleDelete = async (id) => {
-    const confirm = await Swal.fire({
-      title: "Are you sure?",
-      text: "This book will be deleted!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#dc2626",
-      confirmButtonText: "Yes, delete it",
-    });
+const handleDelete = async (id) => {
+  console.log("Deleting book id:", id); // <-- check what ID is being sent
 
-    if (!confirm.isConfirmed) return;
+  const confirm = await Swal.fire({
+    title: "Are you sure?",
+    text: "This book will be deleted!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#dc2626",
+    confirmButtonText: "Yes, delete it",
+  });
 
-    try {
-      const res = await axiosSecure.delete(`/books/${id}`);
-      if (res.data.deletedCount > 0) {
-        setBooks(prev => prev.filter(book => book._id !== id));
-        Swal.fire("Deleted!", "Book deleted successfully", "success");
-      }
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "Failed to delete book", "error");
+  if (!confirm.isConfirmed) return;
+
+  try {
+    const res = await axiosSecure.delete(`/books/${id}`);
+    console.log("Delete response:", res.data);
+
+    if (res.data?.success) {
+      setBooks(prev => prev.filter(book => book._id !== id));
+      Swal.fire("Deleted!", "Book deleted successfully", "success");
+    } else {
+      Swal.fire("Error", res.data?.message || "Failed to delete book", "error");
     }
-  };
+  } catch (err) {
+    console.error("Delete book error:", err);
+    Swal.fire("Error", "Server error while deleting book", "error");
+  }
+};
+
 
   // ---------------- Publish / Unpublish ----------------
   const toggleStatus = async (id, currentStatus) => {
     const newStatus = currentStatus === "published" ? "unpublished" : "published";
 
     try {
-      const res = await axiosSecure.put(`/books/status/${id}`, { status: newStatus });
+      const res = await axiosSecure.patch(`/books/status/${id}`, { status: newStatus });
       if (res.data.modifiedCount > 0) {
-        setBooks(prev =>
-          prev.map(book =>
-            book._id === id ? { ...book, status: newStatus } : book
-          )
+        setBooks((prev) =>
+          prev.map((book) => (book._id === id ? { ...book, status: newStatus } : book))
         );
       }
     } catch (err) {
-      console.error(err);
+      console.error("Status update error:", err);
       Swal.fire("Error", "Failed to update status", "error");
     }
   };
@@ -74,9 +78,9 @@ export default function ManageBooks() {
     <div className="bg-white p-6 rounded-xl text-black shadow-sm">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Manage Books</h1>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-[70vh]">
         <table className="min-w-full border border-gray-200">
-          <thead className="bg-gray-100">
+          <thead className="bg-gray-100 sticky top-0">
             <tr className="text-sm text-gray-700">
               <th className="px-4 py-3">Title</th>
               <th className="px-4 py-3">Author</th>
@@ -87,49 +91,53 @@ export default function ManageBooks() {
           </thead>
 
           <tbody>
-            {books.map(book => (
-              <tr key={book._id} className="border-t hover:bg-gray-50">
-                <td className="px-4 py-3">{book.name || book.title}</td>
-                <td className="px-4 py-3">{book.author}</td>
-                <td className="px-4 py-3">৳{book.price}</td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium
-                    ${book.status === "published"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-yellow-100 text-yellow-600"}`}
-                  >
-                    {book.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-center space-x-2">
-                  <button
-                    onClick={() => toggleStatus(book._id, book.status)}
-                    className={`px-3 py-1 text-sm rounded-md transition
-                    ${book.status === "published"
-                      ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
-                      : "bg-green-100 text-green-700 hover:bg-green-200"}`}
-                  >
-                    {book.status === "published" ? "Unpublish" : "Publish"}
-                  </button>
-
-                  {role === "admin" && (
-                    <button
-                      onClick={() => handleDelete(book._id)}
-                      className="px-3 py-1 text-sm rounded-md bg-red-100 text-red-600 hover:bg-red-200"
+            {books.length > 0 ? (
+              books.map((book) => (
+                <tr key={book._id} className="border-t hover:bg-gray-50">
+                  <td className="px-4 py-3">{book.name || book.title}</td>
+                  <td className="px-4 py-3">{book.author}</td>
+                  <td className="px-4 py-3">৳{book.price}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium
+                      ${book.status === "published"
+                        ? "bg-green-100 text-green-600"
+                        : "bg-yellow-100 text-yellow-600"}`}
                     >
-                      Delete
+                      {book.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center space-x-2">
+                    <button
+                      onClick={() => toggleStatus(book._id, book.status)}
+                      className={`px-3 py-1 text-sm rounded-md transition
+                      ${book.status === "published"
+                        ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+                        : "bg-green-100 text-green-700 hover:bg-green-200"}`}
+                    >
+                      {book.status === "published" ? "Unpublish" : "Publish"}
                     </button>
-                  )}
+
+                    {role === "admin" && (
+                      <button
+                        onClick={() => handleDelete(book._id)}
+                        className="px-3 py-1 text-sm rounded-md bg-red-100 text-red-600 hover:bg-red-200"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center py-6 text-gray-500">
+                  No books found
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
-
-        {books.length === 0 && (
-          <p className="text-center py-6 text-gray-500">No books found</p>
-        )}
       </div>
     </div>
   );

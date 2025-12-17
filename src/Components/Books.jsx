@@ -14,8 +14,10 @@ const Books = () => {
     const fetchBooks = async () => {
       try {
         const res = await axiosSecure.get("/books");
-        setBooks(res.data);
-        setFilteredBooks(res.data);
+        // শুধুমাত্র published books রাখছি
+        const publishedBooks = res.data.filter(book => book.status === "published");
+        setBooks(publishedBooks);
+        setFilteredBooks(publishedBooks);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching books:", err);
@@ -25,7 +27,7 @@ const Books = () => {
     fetchBooks();
   }, [axiosSecure]);
 
-  // Search functionality
+  // Search & Sort functionality
   useEffect(() => {
     let tempBooks = [...books];
     if (search) {
@@ -34,7 +36,6 @@ const Books = () => {
       );
     }
 
-    // Sort functionality
     tempBooks.sort((a, b) => {
       if (sortOrder === "asc") return a.price - b.price;
       else return b.price - a.price;

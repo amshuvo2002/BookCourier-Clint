@@ -16,19 +16,22 @@ export default function PaymentPage() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const orderRes = await axiosSecure.get(`/orders/id/${id}`);
-        let orderData = orderRes.data;
+        const { data: orderData } = await axiosSecure.get(`/orders/payment/${id}`);
 
         // যদি price না থাকে তাহলে book থেকে আনবে
         if ((!orderData.price || orderData.price === "N/A") && orderData.bookId) {
-          const bookRes = await axiosSecure.get(`/books/${orderData.bookId}`);
-          orderData = { ...orderData, price: bookRes.data.price };
+          try {
+            const { data: bookData } = await axiosSecure.get(`/books/${orderData.bookId}`);
+            orderData.price = bookData.price;
+          } catch (err) {
+            console.error("Error fetching book price:", err);
+          }
         }
 
         setOrder(orderData);
       } catch (err) {
         console.error(err);
-        Swal.fire("Error", "Failed to fetch order", "error");
+        Swal.fire("Error", "Failed to fetch order!", "error");
       } finally {
         setLoading(false);
       }
@@ -38,7 +41,7 @@ export default function PaymentPage() {
   }, [id, axiosSecure]);
 
   // ===============================
-  // Handle payment with confirmation
+  // Handle payment
   // ===============================
   const handlePayment = async () => {
     const confirm = await Swal.fire({
@@ -50,12 +53,19 @@ export default function PaymentPage() {
       cancelButtonText: "No, cancel",
     });
 
-    if (!confirm.isConfirmed) return; // ইউজার No দিলে return
+    if (!confirm.isConfirmed) return;
 
     try {
-      await axiosSecure.patch(`/orders/pay/${id}`);
-      Swal.fire("Success", "Payment completed successfully!", "success");
-      navigate("/dashboard/user/my-orders");
+      // ==========================
+      // Use backend route for status update
+      // ==========================
+      const { data } = await axiosSecure.patch(`/orders/${id}/status`, { status: "paid" });
+      if (data.modifiedCount > 0) {
+        Swal.fire("Success", "Payment completed successfully!", "success");
+        navigate("/dashboard/user/my-orders");
+      } else {
+        Swal.fire("Error", "Payment could not be completed!", "error");
+      }
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "Payment failed!", "error");
@@ -70,12 +80,12 @@ export default function PaymentPage() {
       <h2 className="text-xl font-bold mb-4">Payment Page</h2>
 
       <p className="mb-2">
-        <strong>Book:</strong>{" "}
-        {order.bookTitle || order.bookName || "N/A"}
+        <strong>Book:</strong> {order.bookTitle || order.bookName || "N/A"}
       </p>
 
       <p className="mb-4">
-        <strong>Price:</strong> ${order.price || "N/A"}
+        <strong>Price:</strong>{" "}
+        {order.price !== undefined ? `BDT ${order.price.toLocaleString()}` : "N/A"}
       </p>
 
       <button

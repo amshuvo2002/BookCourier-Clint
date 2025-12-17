@@ -5,12 +5,10 @@ import UseAxious from "../Hooks/UseAxious";
 import {
   FiBook,
   FiUsers,
-  FiSettings,
-  FiPackage,
-  FiPlusCircle,
-  FiClipboard,
   FiMenu,
 } from "react-icons/fi";
+import { CgProfile } from "react-icons/cg";
+import { GiReceiveMoney } from "react-icons/gi";
 
 const AdminDashboard = () => {
   const { user, loading: authLoading } = useContext(Authcontext);
@@ -50,10 +48,10 @@ const AdminDashboard = () => {
 
   const adminLinks = [
     { name: "Users", path: "/dashboard/admin/users", icon: <FiUsers /> },
-    { name: "Add Books", path: "/dashboard/admin/add-books", icon: <FiPlusCircle /> },
     { name: "Books", path: "/dashboard/admin/books", icon: <FiBook /> },
-    { name: "Orders", path: "/dashboard/admin/orders", icon: <FiClipboard /> },
-    { name: "Request Delivery", path: "/dashboard/admin/request-delivery", icon: <FiPackage /> },
+    { name: "profile", path: "/dashboard/admin/profile", icon: <CgProfile /> },
+    { name: "monthlySales", path: "/dashboard/admin/monthlySales", icon: <GiReceiveMoney />},
+   
   ];
 
   return (

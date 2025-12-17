@@ -1,31 +1,32 @@
+// File: AdminAddBook.jsx
 import { useState } from "react";
 import UseAxious from "../Hooks/UseAxious";
 import Swal from "sweetalert2";
 
 const AdminAddBook = () => {
-  const axiosSecure = UseAxious(); // Custom axios hook
+  const axiosSecure = UseAxious();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
+    title: "", // backend অনুযায়ী
     author: "",
-    img: "", // backend অনুযায়ী 'img'
-    status: "published",
+    img: "",
+    status: "published", // default
     price: "",
   });
 
-  // Handle input change
+  // Input change handler
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submit
+  // Add book
   const handleAddBook = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await axiosSecure.post("/books", formData); // Hook ব্যবহার করে POST
+      const res = await axiosSecure.post("/books", formData);
 
       if (res.data.insertedId) {
         Swal.fire({
@@ -37,7 +38,7 @@ const AdminAddBook = () => {
 
         // Reset form
         setFormData({
-          name: "",
+          title: "",
           author: "",
           img: "",
           status: "published",
@@ -63,17 +64,17 @@ const AdminAddBook = () => {
       <h2 className="text-2xl font-semibold mb-6">➕ Add New Book</h2>
 
       <form onSubmit={handleAddBook} className="space-y-4">
-        {/* Book Name */}
+        {/* Book Title */}
         <div>
-          <label className="font-medium">Book Name</label>
+          <label className="font-medium">Book Title</label>
           <input
             type="text"
-            name="name"
-            value={formData.name}
+            name="title"
+            value={formData.title}
             onChange={handleChange}
             required
             className="w-full p-2 border rounded mt-1"
-            placeholder="Enter book name"
+            placeholder="Enter book title"
           />
         </div>
 
@@ -96,7 +97,7 @@ const AdminAddBook = () => {
           <label className="font-medium">Image URL</label>
           <input
             type="text"
-            name="img" // backend অনুযায়ী
+            name="img"
             value={formData.img}
             onChange={handleChange}
             required

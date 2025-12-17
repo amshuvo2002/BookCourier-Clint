@@ -115,7 +115,7 @@ const router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <ManageBooks /> },
           { path: "manage-books", element: <ManageBooks /> },
-          { path: "add-book", element: <AddBook /> },
+          { path: "add-book", element:  <AdminAddBook /> },
           { path: "requests", element: <ManageRequests /> },
         ],
       },
@@ -127,6 +127,7 @@ const router = createBrowserRouter([
         path: "admin",
         element: <AdminDashboard />,
         children: [
+          { path: "profile", element: <MyProfile /> },
           { path: "dashboard", element: <AdminAddBook /> },
           { path: "monthlySales", element: <SalesChart /> },
           { path: "add-books", element: <AdminAddBook /> },

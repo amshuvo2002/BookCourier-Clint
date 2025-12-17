@@ -54,8 +54,8 @@ const OrdersPage = () => {
     if (result.isConfirmed) {
       try {
         await axiosSecure.patch(`/orders/${id}/status`, { status: "cancelled" });
+        setOrders(prev => prev.map(o => o._id === id ? { ...o, status: "cancelled" } : o));
         Swal.fire("Canceled!", "Order has been cancelled.", "success");
-        fetchOrders();
       } catch (error) {
         console.error("Error cancelling order:", error);
       }
@@ -64,17 +64,26 @@ const OrdersPage = () => {
 
   // Update status
   const updateStatus = async (id, currentStatus) => {
-    let newStatus;
-    if (currentStatus === "pending") newStatus = "shipped";
-    else if (currentStatus === "shipped") newStatus = "delivered";
-    else return;
+    let newStatus = null;
+
+    switch (currentStatus.toLowerCase()) {
+      case "pending":
+        newStatus = "shipped";
+        break;
+      case "shipped":
+        newStatus = "delivered";
+        break;
+      default:
+        return;
+    }
 
     try {
       await axiosSecure.patch(`/orders/${id}/status`, { status: newStatus });
+      setOrders(prev => prev.map(o => (o._id === id ? { ...o, status: newStatus } : o)));
       Swal.fire("Updated!", `Status changed to ${newStatus}`, "success");
-      fetchOrders();
     } catch (error) {
       console.error("Error updating status:", error);
+      Swal.fire("Error", "Failed to update status", "error");
     }
   };
 
@@ -91,8 +100,8 @@ const OrdersPage = () => {
     if (result.isConfirmed) {
       try {
         await axiosSecure.delete(`/orders/${id}`);
+        setOrders(prev => prev.filter(o => o._id !== id));
         Swal.fire("Deleted!", "Order has been deleted.", "success");
-        fetchOrders();
       } catch (error) {
         console.error("Error deleting order:", error);
       }
@@ -116,6 +125,13 @@ const OrdersPage = () => {
             </tr>
           </thead>
           <tbody>
+            {orders.length === 0 && (
+              <tr>
+                <td colSpan="5" className="text-center py-6 text-gray-500">
+                  No orders found
+                </td>
+              </tr>
+            )}
             {orders.map((order) => (
               <tr key={order._id} className="border-b hover:bg-gray-50">
                 <td className="py-2 px-4">{order.bookTitle || "No Title"}</td>
@@ -135,7 +151,13 @@ const OrdersPage = () => {
                     {order.status}
                   </span>
                 </td>
-                <td className="py-2 px-4 capitalize">{order.paymentStatus}</td>
+                <td className="py-2 px-4">
+                  {order.paymentStatus === "paid" ? (
+                    <span className="px-2 py-1 rounded bg-green-500 text-white">Paid</span>
+                  ) : (
+                    <span className="px-2 py-1 rounded bg-red-500 text-white">Unpaid</span>
+                  )}
+                </td>
                 <td className="py-2 px-4 space-x-2">
                   {role === "librarian" && order.status !== "delivered" && order.status !== "cancelled" && (
                     <button
@@ -166,12 +188,6 @@ const OrdersPage = () => {
             ))}
           </tbody>
         </table>
-
-        {orders.length === 0 && (
-          <p className="text-center py-6 text-gray-500">
-            No orders found
-          </p>
-        )}
       </div>
     </div>
   );

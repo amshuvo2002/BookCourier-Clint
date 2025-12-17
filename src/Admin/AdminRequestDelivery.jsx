@@ -1,4 +1,3 @@
-// File: AdminRequestDelivery.jsx
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import UseAxious from "../Hooks/UseAxious";
@@ -8,6 +7,7 @@ export default function AdminRequestDelivery() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch all delivery requests
   const fetchRequests = async () => {
     try {
       const res = await axiosSecure.get("/delivery-requests");
@@ -39,17 +39,13 @@ export default function AdminRequestDelivery() {
     if (!result.isConfirmed) return;
 
     try {
-      const res = await axiosSecure.patch(
-        `/delivery-requests/${status}/${id}`
-      );
-
+      const res = await axiosSecure.patch(`/delivery-requests/${status}/${id}`);
       if (res.data.modifiedCount > 0) {
         Swal.fire(
           status === "approved" ? "Approved!" : "Rejected!",
           `Delivery request ${status}.`,
           status === "approved" ? "success" : "error"
         );
-
         setRequests(prev =>
           prev.map(item =>
             item._id === id ? { ...item, status } : item
@@ -78,11 +74,8 @@ export default function AdminRequestDelivery() {
 
     try {
       const res = await axiosSecure.delete(`/delivery-requests/${id}`);
-
       if (res.data.deletedCount > 0) {
         Swal.fire("Deleted!", "Delivery request deleted successfully", "success");
-
-        // ❌ UI থেকেও remove
         setRequests(prev => prev.filter(item => item._id !== id));
       }
     } catch (err) {
@@ -91,23 +84,23 @@ export default function AdminRequestDelivery() {
     }
   };
 
-  if (loading)
-    return <p className="text-center py-10 font-bold">Loading...</p>;
+  if (loading) return <p className="text-center py-10 font-bold">Loading...</p>;
 
   return (
     <div className="p-6 text-black">
       <h2 className="text-2xl font-bold mb-5">📦 Admin Delivery Requests</h2>
 
-      <div className="overflow-x-auto">
-        <table className="table w-full border">
-          <thead className="bg-gray-100 text-black">
+      {/* Scrollable table */}
+      <div className="overflow-x-auto max-h-[500px] overflow-y-auto border rounded">
+        <table className="table w-full border-collapse border border-gray-200">
+          <thead className="bg-gray-100 text-black sticky top-0">
             <tr>
-              <th>#</th>
-              <th>User</th>
-              <th>Book</th>
-              <th>Address</th>
-              <th>Status</th>
-              <th className="text-center">Actions</th>
+              <th className="border px-4 py-2">#</th>
+              <th className="border px-4 py-2">User</th>
+              <th className="border px-4 py-2">Book</th>
+              <th className="border px-4 py-2">Address</th>
+              <th className="border px-4 py-2">Status</th>
+              <th className="border px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
 
@@ -121,13 +114,12 @@ export default function AdminRequestDelivery() {
             )}
 
             {requests.map((r, index) => (
-              <tr key={r._id}>
-                <td>{index + 1}</td>
-                <td>{r.user || r.userEmail || "Unknown"}</td>
-                <td>{r.book || r.bookName || "Unknown"}</td>
-                <td>{r.address || "No address provided"}</td>
-
-                <td>
+              <tr key={r._id} className="hover:bg-gray-50">
+                <td className="border px-4 py-2">{index + 1}</td>
+                <td className="border px-4 py-2">{r.user || r.userEmail || "Unknown"}</td>
+                <td className="border px-4 py-2">{r.book || r.bookName || "Unknown"}</td>
+                <td className="border px-4 py-2">{r.address || "No address provided"}</td>
+                <td className="border px-4 py-2">
                   <span
                     className={`px-2 py-1 rounded text-white ${
                       r.status === "pending"
@@ -140,8 +132,7 @@ export default function AdminRequestDelivery() {
                     {r.status}
                   </span>
                 </td>
-
-                <td className="text-center flex justify-center gap-2">
+                <td className="border px-4 py-2 text-center flex justify-center gap-2">
                   <button
                     onClick={() => handleUpdateStatus(r._id, "approved")}
                     disabled={r.status !== "pending"}
@@ -158,7 +149,6 @@ export default function AdminRequestDelivery() {
                     Reject
                   </button>
 
-                  {/* DELETE */}
                   <button
                     onClick={() => handleDelete(r._id)}
                     className="px-3 py-1 bg-gray-700 text-white rounded hover:bg-black"

@@ -16,11 +16,12 @@ const Home = () => {
   useEffect(() => {
     AOS.init({ duration: 1000, once: true, easing: "ease-in-out" });
 
-    // ---- Fetch Latest 4 Books ----
+    // ---- Fetch Latest 4 Published Books ----
     const fetchBooks = async () => {
       try {
-        const res = await axiosSecure.get("/books"); 
-        const data = res.data.reverse().slice(0, 4); // last 4 books
+        const res = await axiosSecure.get("/books");
+        const publishedBooks = res.data.filter(book => book.status === "published");
+        const data = publishedBooks.reverse().slice(0, 4); // last 4 published books
         setLatestBooks(data);
       } catch (err) {
         console.error("Error fetching books:", err);

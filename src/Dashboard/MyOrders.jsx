@@ -11,16 +11,33 @@ export default function MyOrders() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // -------------------------
-  // Fetch orders
-  // -------------------------
   useEffect(() => {
     if (!user?.email) return;
 
     const fetchOrders = async () => {
       try {
         const { data: ordersData } = await axiosSecure.get(`/orders/${user.email}`);
-        setOrders(ordersData);
+
+        const ordersWithBookData = await Promise.all(
+          ordersData.map(async (o) => {
+            let price = o.price ?? null;
+            let bookTitle = o.bookTitle ?? o.title ?? null;
+
+            if (!price || !bookTitle) {
+              try {
+                const bookRes = await axiosSecure.get(`/books/${o.bookId}`);
+                price = price ?? bookRes.data.price;
+                bookTitle = bookTitle ?? bookRes.data.title;
+              } catch (err) {
+                console.error("Error fetching book for order", o._id, err);
+              }
+            }
+
+            return { ...o, price, bookTitle };
+          })
+        );
+
+        setOrders(ordersWithBookData);
       } catch (err) {
         console.error("Error fetching orders:", err);
         Swal.fire("Error", "Failed to fetch orders!", "error");
@@ -32,9 +49,9 @@ export default function MyOrders() {
     fetchOrders();
   }, [user, axiosSecure]);
 
-  // -------------------------
+  // ================================
   // Cancel order
-  // -------------------------
+  // ================================
   const handleCancel = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -49,7 +66,6 @@ export default function MyOrders() {
 
     try {
       const { data } = await axiosSecure.patch(`/orders/${id}/status`, { status: "cancelled" });
-
       if (data.modifiedCount > 0) {
         setOrders((prev) => prev.map(o => o._id === id ? { ...o, status: "cancelled" } : o));
         Swal.fire("Cancelled", "Your order has been cancelled!", "success");
@@ -62,22 +78,48 @@ export default function MyOrders() {
     }
   };
 
-  // -------------------------
-  // Pay order
-  // -------------------------
-  const handlePay = async (id) => {
-    try {
-      const { data } = await axiosSecure.patch(`/orders/${id}/status`, { status: "paid" });
+  // ================================
+  // Delete order (no refresh)
+  // ================================
+  const handleDelete = async (id) => {
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to delete this order permanently?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No",
+    });
 
-      if (data.modifiedCount > 0) {
-        setOrders((prev) => prev.map(o => o._id === id ? { ...o, status: "paid", paymentStatus: "paid" } : o));
-        Swal.fire("Success", "Payment completed!", "success");
-      } else {
-        Swal.fire("Error", "Payment failed!", "error");
-      }
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await axiosSecure.delete(`/orders/${id}`);
+      setOrders((prev) => prev.filter(o => o._id !== id));
+      Swal.fire("Deleted", "Order has been deleted!", "success");
     } catch (err) {
       console.error(err);
-      Swal.fire("Error", "Payment failed!", "error");
+      Swal.fire("Error", "Failed to delete order!", "error");
+    }
+  };
+
+  const handlePay = async (order) => {
+    if (!order._id) {
+      Swal.fire("Error", "Order ID missing!", "error");
+      return;
+    }
+
+    try {
+      const { data } = await axiosSecure.get(`/orders/payment/${order._id.toString()}`);
+      if (!data) {
+        Swal.fire("Error", "Order not found!", "error");
+        return;
+      }
+
+      navigate(`/dashboard/user/my-orders/payment/${data._id.toString()}`, { state: { order: data } });
+    } catch (err) {
+      console.error("Payment fetch error:", err.response?.data || err);
+      Swal.fire("Error", err.response?.data?.message || "Failed to fetch order!", "error");
     }
   };
 
@@ -96,23 +138,28 @@ export default function MyOrders() {
               <th className="border p-2 text-left">Date</th>
               <th className="border p-2 text-center">Cancel</th>
               <th className="border p-2 text-center">Pay Now</th>
+              <th className="border p-2 text-center">Delete</th>
             </tr>
           </thead>
           <tbody>
             {orders.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center py-4">No orders found</td>
+                <td colSpan={6} className="text-center py-4">No orders found</td>
               </tr>
             )}
             {orders.map((o) => {
               const isPaid = o.paymentStatus === "paid" || o.status === "paid";
               const isCancelled = o.status === "cancelled";
 
+              const price = o.price ?? "N/A";
+              const orderDate = o.orderDate ?? o.createdAt ?? null;
+              const bookName = o.bookTitle ?? "N/A";
+
               return (
                 <tr key={o._id} className="hover:bg-gray-50">
-                  <td className="border p-2">{o.bookTitle || "N/A"}</td>
-                  <td className="border p-2">{o.price ? `$${o.price}` : "N/A"}</td>
-                  <td className="border p-2">{o.orderDate ? new Date(o.orderDate).toLocaleDateString() : "N/A"}</td>
+                  <td className="border p-2">{bookName}</td>
+                  <td className="border p-2">{price !== "N/A" ? `BDT ${price}` : "N/A"}</td>
+                  <td className="border p-2">{orderDate ? new Date(orderDate).toLocaleDateString() : "N/A"}</td>
                   <td className="border p-2 text-center">
                     {!isPaid && !isCancelled && (
                       <button
@@ -127,13 +174,21 @@ export default function MyOrders() {
                   <td className="border p-2 text-center">
                     {!isPaid && !isCancelled && (
                       <button
-                        onClick={() => handlePay(o._id)}
+                        onClick={() => handlePay(o)}
                         className="px-3 py-1 bg-green-600 text-white rounded"
                       >
                         Pay Now
                       </button>
                     )}
                     {isPaid && <span className="text-green-600">Paid</span>}
+                  </td>
+                  <td className="border p-2 text-center">
+                    <button
+                      onClick={() => handleDelete(o._id)}
+                      className="px-3 py-1 bg-gray-700 text-white rounded"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               );

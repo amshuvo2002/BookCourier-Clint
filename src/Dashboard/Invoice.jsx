@@ -9,6 +9,9 @@ export default function Invoices() {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ===============================
+  // Fetch invoices
+  // ===============================
   useEffect(() => {
     if (!user?.email) return;
 
@@ -16,25 +19,29 @@ export default function Invoices() {
       try {
         const res = await axiosSecure.get(`/orders/${user.email}`);
         const paidOrders = res.data.filter(
-          (o) => o.paymentStatus === "paid" || o.status === "success"
+          (o) => o.paymentStatus === "paid" || o.status === "paid" || o.status === "success"
         );
 
-        const ordersWithPrice = await Promise.all(
+        const ordersWithBookData = await Promise.all(
           paidOrders.map(async (o) => {
-            if (!o.price && o.bookId) {
+            let price = o.price ?? null;
+            let bookTitle = o.bookTitle ?? o.title ?? null;
+
+            if ((!price || !bookTitle) && o.bookId) {
               try {
                 const bookRes = await axiosSecure.get(`/books/${o.bookId}`);
-                return { ...o, price: bookRes.data.price || "N/A" };
+                price = price ?? bookRes.data.price;
+                bookTitle = bookTitle ?? bookRes.data.title;
               } catch (err) {
-                console.error("Error fetching book price:", err);
-                return { ...o, price: "N/A" };
+                console.error("Error fetching book data:", err);
               }
             }
-            return o;
+
+            return { ...o, price, bookTitle };
           })
         );
 
-        setInvoices(ordersWithPrice);
+        setInvoices(ordersWithBookData);
       } catch (err) {
         console.error("Error fetching invoices:", err);
       } finally {
@@ -45,9 +52,9 @@ export default function Invoices() {
     fetchInvoices();
   }, [user, axiosSecure]);
 
-  // ------------------------
-  // Fixed Delete
-  // ------------------------
+  // ===============================
+  // Delete invoice
+  // ===============================
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -61,10 +68,7 @@ export default function Invoices() {
     if (!confirm.isConfirmed) return;
 
     try {
-      // Fixed endpoint: /orders/:id
       await axiosSecure.delete(`/orders/${id}`);
-
-      // Remove from state
       setInvoices((prev) => prev.filter((inv) => inv._id !== id));
       Swal.fire("Deleted!", "Invoice has been deleted.", "success");
     } catch (err) {
@@ -96,8 +100,15 @@ export default function Invoices() {
             {invoices.length > 0 ? (
               invoices.map((invoice) => (
                 <tr key={invoice._id} className="hover:bg-gray-100">
-                  <td className="border p-2">{invoice.paymentId || "N/A"}</td>
-                  <td className="border p-2">${invoice.price || "N/A"}</td>
+                  <td className="border p-2">
+                      <strong>ID : </strong>{" "}
+                    {invoice.paymentId || invoice.transactionId || invoice._id || "N/A"}
+                  </td>
+                  <td className="border p-2">
+                    {invoice.price !== undefined
+                      ? `BDT ${invoice.price.toLocaleString()}`
+                      : "N/A"}
+                  </td>
                   <td className="border p-2">
                     {invoice.paidAt
                       ? new Date(invoice.paidAt).toLocaleDateString()
@@ -131,19 +142,24 @@ export default function Invoices() {
 
       {/* Mobile Accordion */}
       <div className="md:hidden space-y-4">
-        {invoices.length === 0 && (
-          <p className="text-center py-4">No invoices found.</p>
-        )}
+        {invoices.length === 0 && <p className="text-center py-4">No invoices found.</p>}
 
         {invoices.map((invoice) => (
           <div key={invoice._id} className="border rounded shadow p-3 bg-white">
             <div className="flex justify-between items-center">
               <span className="font-semibold">{invoice.bookTitle || "N/A"}</span>
-              <span className="text-gray-800">${invoice.price || "N/A"}</span>
+              <span className="text-gray-800">
+                {invoice.price !== undefined
+                  ? `BDT ${invoice.price.toLocaleString()}`
+                  : "N/A"}
+              </span>
             </div>
 
             <div className="mt-2 text-sm text-gray-600">
-              <p><strong>Payment ID:</strong> {invoice.paymentId || "N/A"}</p>
+              <p>
+                <strong>Payment ID:</strong>{" "}
+                {invoice.paymentId || invoice.transactionId || invoice._id || "N/A"}
+              </p>
               <p>
                 <strong>Date:</strong>{" "}
                 {invoice.paidAt

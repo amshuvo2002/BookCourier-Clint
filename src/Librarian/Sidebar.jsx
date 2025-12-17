@@ -20,7 +20,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen w-full bg-gray-100">
       {/* Sidebar */}
       <aside
         className={`bg-white border-r shadow-sm transition-all duration-300
