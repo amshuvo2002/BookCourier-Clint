@@ -45,7 +45,7 @@ const DashboardLayout = () => {
   }, [authLoading, user, navigate, location.pathname, axiosSecure]);
 
   if (authLoading || loading)
-    return <p className="p-5 text-center">Loading...</p>;
+    return <p className="md:p-5 p-0 text-center">Loading...</p>;
 
   // Sidebar links
   const sidebarLinks = {

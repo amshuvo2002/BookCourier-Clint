@@ -1,16 +1,102 @@
-# React + Vite
+BookCourier – Library-to-Home Delivery System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+1. Live Website :  https://your-live-site-link.com  
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## React Compiler
+2. Project Purpose
+This project is a Library Management System designed to manage books, users, and orders efficiently.  
+It provides separate dashboards for users, librarians, and admins with role-based access control.  
+The system is fully responsive and optimized for both desktop and mobile devices.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
+3. Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+User Features
+- User authentication (Login and Registration)
+- Browse available books
+- Add books to wishlist
+- Place book orders
+- View order history
+- View invoices
+- Responsive user dashboard
+
+Librarian Features
+- Manage own books
+- Add new books
+- Publish and unpublish books
+- Manage book requests
+- View order statistics using charts
+
+Admin Features
+- Manage users
+- Manage books
+- Manage orders
+- Request delivery
+- Site settings management
+- Role-based access control
+
+Dashboard Features
+- Separate dashboards for User, Librarian, and Admin
+- Sidebar navigation with toggle option
+- Scrollable dashboard layout for small devices
+- Dynamic charts for monthly orders and sales
+
+
+4. Technologies Used
+
+Frontend
+- React
+- React Router
+- Tailwind CSS
+- Recharts
+- SweetAlert2
+- React Icons
+
+Backend
+- Node.js
+- Express.js
+- MongoDB
+
+
+5. NPM Packages Used
+
+Frontend Packages
+- react
+- react-router-dom
+- axios
+- sweetalert2
+- recharts
+- react-icons
+
+Backend Packages
+- express
+- cors
+- dotenv
+- mongodb
+- jsonwebtoken
+
+Responsive Design
+- Fully responsive layout for mobile, tablet, and desktop
+- Scrollable dashboard content on small devices
+- Responsive charts using Recharts
+
+Authentication and Security
+- JWT-based authentication
+- Protected routes
+- Role-based authorization (User, Librarian, Admin)
+
+
+6. Developer
+Name: Md. Altaf Mahmud Shuvo  
+Role: Full Stack Developer  
+
+7. Future Improvements
+- Payment system integration
+- Email notification system
+- Advanced reporting and analytics
+- Dark mode support
+
+
+8. Conclusion
+This project demonstrates a complete role-based full stack application with proper authentication, authorization, and responsive user interface.

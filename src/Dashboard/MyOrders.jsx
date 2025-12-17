@@ -49,9 +49,7 @@ export default function MyOrders() {
     fetchOrders();
   }, [user, axiosSecure]);
 
-  // ================================
   // Cancel order
-  // ================================
   const handleCancel = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -78,9 +76,7 @@ export default function MyOrders() {
     }
   };
 
-  // ================================
-  // Delete order (no refresh)
-  // ================================
+  // Delete order
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -129,72 +125,79 @@ export default function MyOrders() {
     <div className="text-black px-2 md:px-0">
       <h1 className="text-xl font-bold mb-4">My Orders</h1>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px] border-collapse">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="border p-2 text-left">Book Name</th>
-              <th className="border p-2 text-left">Price</th>
-              <th className="border p-2 text-left">Date</th>
-              <th className="border p-2 text-center">Cancel</th>
-              <th className="border p-2 text-center">Pay Now</th>
-              <th className="border p-2 text-center">Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.length === 0 && (
+      {/* এই div টা মোবাইলে সুন্দর স্ক্রলবার দেবে */}
+      <div className="overflow-x-auto -mx-4 px-4">
+        <div className="inline-block min-w-full align-middle">
+          <table className="min-w-full min-w-[700px] border-collapse bg-white">
+            <thead className="bg-gray-200">
               <tr>
-                <td colSpan={6} className="text-center py-4">No orders found</td>
+                <th className="border p-3 text-left">Book Name</th>
+                <th className="border p-3 text-left">Price</th>
+                <th className="border p-3 text-left">Date</th>
+                <th className="border p-3 text-center">Cancel</th>
+                <th className="border p-3 text-center">Pay Now</th>
+                <th className="border p-3 text-center">Delete</th>
               </tr>
-            )}
-            {orders.map((o) => {
-              const isPaid = o.paymentStatus === "paid" || o.status === "paid";
-              const isCancelled = o.status === "cancelled";
-
-              const price = o.price ?? "N/A";
-              const orderDate = o.orderDate ?? o.createdAt ?? null;
-              const bookName = o.bookTitle ?? "N/A";
-
-              return (
-                <tr key={o._id} className="hover:bg-gray-50">
-                  <td className="border p-2">{bookName}</td>
-                  <td className="border p-2">{price !== "N/A" ? `BDT ${price}` : "N/A"}</td>
-                  <td className="border p-2">{orderDate ? new Date(orderDate).toLocaleDateString() : "N/A"}</td>
-                  <td className="border p-2 text-center">
-                    {!isPaid && !isCancelled && (
-                      <button
-                        onClick={() => handleCancel(o._id)}
-                        className="px-3 py-1 bg-red-500 text-white rounded"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                    {isCancelled && <span className="text-gray-500">Cancelled</span>}
-                  </td>
-                  <td className="border p-2 text-center">
-                    {!isPaid && !isCancelled && (
-                      <button
-                        onClick={() => handlePay(o)}
-                        className="px-3 py-1 bg-green-600 text-white rounded"
-                      >
-                        Pay Now
-                      </button>
-                    )}
-                    {isPaid && <span className="text-green-600">Paid</span>}
-                  </td>
-                  <td className="border p-2 text-center">
-                    <button
-                      onClick={() => handleDelete(o._id)}
-                      className="px-3 py-1 bg-gray-700 text-white rounded"
-                    >
-                      Delete
-                    </button>
+            </thead>
+            <tbody>
+              {orders.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="text-center py-10 text-gray-500">
+                    No orders found
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              )}
+              {orders.map((o) => {
+                const isPaid = o.paymentStatus === "paid" || o.status === "paid";
+                const isCancelled = o.status === "cancelled";
+
+                const price = o.price ?? "N/A";
+                const orderDate = o.orderDate ?? o.createdAt ?? null;
+                const bookName = o.bookTitle ?? "N/A";
+
+                return (
+                  <tr key={o._id} className="hover:bg-gray-50">
+                    <td className="border p-3">{bookName}</td>
+                    <td className="border p-3">{price !== "N/A" ? `BDT ${price}` : "N/A"}</td>
+                    <td className="border p-3">
+                      {orderDate ? new Date(orderDate).toLocaleDateString() : "N/A"}
+                    </td>
+                    <td className="border p-3 text-center">
+                      {!isPaid && !isCancelled && (
+                        <button
+                          onClick={() => handleCancel(o._id)}
+                          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                        >
+                          Cancel
+                        </button>
+                      )}
+                      {isCancelled && <span className="text-gray-500">Cancelled</span>}
+                    </td>
+                    <td className="border p-3 text-center">
+                      {!isPaid && !isCancelled && (
+                        <button
+                          onClick={() => handlePay(o)}
+                          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                        >
+                          Pay Now
+                        </button>
+                      )}
+                      {isPaid && <span className="text-green-600 font-medium">Paid</span>}
+                    </td>
+                    <td className="border p-3 text-center">
+                      <button
+                        onClick={() => handleDelete(o._id)}
+                        className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 text-sm"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

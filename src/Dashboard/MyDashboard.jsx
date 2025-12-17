@@ -2,22 +2,18 @@ import React, { useEffect, useState, useContext } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router";
 import { Authcontext } from "../Context/Authcontext";
 import UseAxious from "../Hooks/UseAxious";
-import {
-  FiUser,
-  FiShoppingCart,
-  FiFileText,
-  FiMenu
-} from "react-icons/fi";
+import { FiUser, FiShoppingCart, FiFileText, FiMenu, FiLogOut } from "react-icons/fi";
 import { FcTodoList } from "react-icons/fc";
 
 const MyDashboard = () => {
-  const { user, loading: authLoading } = useContext(Authcontext);
+  const { user, loading: authLoading, logout } = useContext(Authcontext);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const axiosSecure = UseAxious();
   const navigate = useNavigate();
 
+  // Fetch role
   useEffect(() => {
     const fetchRole = async () => {
       if (user?.email) {
@@ -53,18 +49,25 @@ const MyDashboard = () => {
     { name: "Invoices", path: "/dashboard/user/invoices", icon: <FiFileText /> },
   ];
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar */}
       <aside
-        className={`bg-white border-r shadow-sm transition-all duration-300
-        ${sidebarOpen ? "w-64" : "w-20"}`}
+        className={`bg-white border-r shadow-sm h-screen transition-all duration-300
+        ${sidebarOpen ? "w-64" : "w-20"} overflow-y-auto`}
       >
-        <div className="flex items-center justify-between px-4 h-16 border-b">
-          {sidebarOpen && (
-            <h2 className="text-lg font-bold text-gray-800">
-              User Dashboard
-            </h2>
-          )}
+        {/* Sidebar header */}
+        <div className="flex items-center justify-between px-4 h-10 border-b">
+          {sidebarOpen && <h2 className="text-lg font-bold text-gray-800">User Dashboard</h2>}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 rounded hover:bg-gray-200 text-gray-700"
@@ -73,6 +76,8 @@ const MyDashboard = () => {
           </button>
         </div>
 
+     
+        {/* Links */}
         <ul className="mt-4 space-y-1 px-2">
           {userLinks.map((link) => (
             <li key={link.name}>
@@ -80,11 +85,9 @@ const MyDashboard = () => {
                 to={link.path}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition
-                  ${
-                    isActive
-                      ? "bg-blue-100 text-blue-600"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                  }`
+                  ${isActive
+                    ? "bg-blue-100 text-blue-600"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`
                 }
               >
                 <span className="text-lg">{link.icon}</span>
@@ -92,10 +95,13 @@ const MyDashboard = () => {
               </NavLink>
             </li>
           ))}
+
+         
         </ul>
       </aside>
 
-      <main className="flex-1 p-6">
+      {/* Main content */}
+      <main className="flex-1 md:p-6 p-2 overflow-auto">
         <Outlet />
       </main>
     </div>
