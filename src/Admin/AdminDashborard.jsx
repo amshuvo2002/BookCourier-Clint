@@ -56,7 +56,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
-      {/* Sidebar */}
+   
       <aside
         className={`bg-white border-r shadow-sm transition-all duration-300 h-full
         ${sidebarOpen ? "w-64" : "w-20"}`}
@@ -97,7 +97,7 @@ const AdminDashboard = () => {
         </ul>
       </aside>
 
-      {/* Main Content */}
+    
       <main className="flex-1 h-full overflow-hidden">
         <Outlet />
       </main>

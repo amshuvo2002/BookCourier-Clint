@@ -13,7 +13,6 @@ const DashboardLayout = () => {
   const location = useLocation();
   const axiosSecure = UseAxious();
 
-  // Fetch role from backend
   useEffect(() => {
     const fetchRole = async () => {
       if (user?.email) {
@@ -22,7 +21,7 @@ const DashboardLayout = () => {
           const userRole = res.data.role || "user";
           setRole(userRole);
 
-          // Auto redirect if at /dashboard
+      
           if (location.pathname === "/dashboard") {
             if (userRole === "admin")
               navigate("/dashboard/admin/users", { replace: true });
@@ -32,7 +31,7 @@ const DashboardLayout = () => {
           }
         } catch (err) {
           console.error("Failed to fetch role:", err);
-          setRole("user"); // default role
+          setRole("user"); 
         } finally {
           setLoading(false);
         }
@@ -47,7 +46,7 @@ const DashboardLayout = () => {
   if (authLoading || loading)
     return <p className="md:p-5 p-0 text-center">Loading...</p>;
 
-  // Sidebar links
+ 
   const sidebarLinks = {
     user: [
       { name: "My Profile", path: "/dashboard/profile" },

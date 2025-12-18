@@ -16,12 +16,11 @@ const Home = () => {
   useEffect(() => {
     AOS.init({ duration: 1000, once: true, easing: "ease-in-out" });
 
-    // ---- Fetch Latest 4 Published Books ----
     const fetchBooks = async () => {
       try {
         const res = await axiosSecure.get("/books");
         const publishedBooks = res.data.filter(book => book.status === "published");
-        const data = publishedBooks.reverse().slice(0, 4); // last 4 published books
+        const data = publishedBooks.reverse().slice(0, 4); 
         setLatestBooks(data);
       } catch (err) {
         console.error("Error fetching books:", err);
@@ -68,7 +67,7 @@ const Home = () => {
   return (
     <div className="space-y-24">
 
-      {/* Banner Section */}
+     
       <div className="max-w-6xl mx-auto mt-10" data-aos="fade-up">
         <Slider {...sliderSettings}>
           {bannerSlides.map((slide) => (
@@ -94,7 +93,7 @@ const Home = () => {
         </Slider>
       </div>
 
-      {/* Latest Books Section (Dynamic) */}
+     
       <div className="max-w-6xl mx-auto px-4">
         <h2 className="text-3xl font-bold mb-8 text-center" data-aos="fade-up">
           Latest Books
@@ -122,7 +121,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Coverage Section */}
+     
       <div className="bg-gray-100 m-10 py-10" data-aos="fade-right">
         <h2 className="text-3xl font-bold text-center mb-5 text-black">
           Service Coverage
@@ -132,7 +131,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Why Choose Section */}
+    
       <div className="max-w-6xl mx-auto py-20 px-4">
         <h2 className="text-3xl font-bold text-center mb-12" data-aos="fade-up">
           Why Choose BookCourier?
@@ -177,7 +176,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Extra Section 1 */}
+    
       <div
         className="bg-blue-50 flex justify-center items-center px-10 py-5 text-center max-w-6xl mx-auto"
         data-aos="fade-up"
@@ -200,7 +199,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Extra Section 2 */}
+    
       <div
         className="py-5 flex gap-5 mb-10 flex-row-reverse justify-center items-center text-center max-w-6xl mx-auto px-10 bg-blue-50"
         data-aos="fade-up"

@@ -1,4 +1,4 @@
-// File: AdminAddBook.jsx
+
 import { useState } from "react";
 import UseAxious from "../Hooks/UseAxious";
 import Swal from "sweetalert2";
@@ -7,20 +7,20 @@ const AdminAddBook = () => {
   const axiosSecure = UseAxious();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: "", // backend অনুযায়ী
+    title: "", 
     author: "",
     img: "",
-    status: "published", // default
+    status: "published", 
     price: "",
   });
 
-  // Input change handler
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Add book
+
   const handleAddBook = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -36,7 +36,7 @@ const AdminAddBook = () => {
           confirmButtonText: "OK",
         });
 
-        // Reset form
+        
         setFormData({
           title: "",
           author: "",
@@ -64,7 +64,7 @@ const AdminAddBook = () => {
       <h2 className="text-2xl font-semibold mb-6">➕ Add New Book</h2>
 
       <form onSubmit={handleAddBook} className="space-y-4">
-        {/* Book Title */}
+       
         <div>
           <label className="font-medium">Book Title</label>
           <input
@@ -78,7 +78,7 @@ const AdminAddBook = () => {
           />
         </div>
 
-        {/* Author */}
+       
         <div>
           <label className="font-medium">Author</label>
           <input
@@ -92,7 +92,6 @@ const AdminAddBook = () => {
           />
         </div>
 
-        {/* Image URL */}
         <div>
           <label className="font-medium">Image URL</label>
           <input
@@ -106,7 +105,6 @@ const AdminAddBook = () => {
           />
         </div>
 
-        {/* Status */}
         <div>
           <label className="font-medium">Status</label>
           <select
@@ -120,7 +118,6 @@ const AdminAddBook = () => {
           </select>
         </div>
 
-        {/* Price */}
         <div>
           <label className="font-medium">Price (৳)</label>
           <input
@@ -134,7 +131,6 @@ const AdminAddBook = () => {
           />
         </div>
 
-        {/* Submit Button */}
         <button
           disabled={loading}
           className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700"

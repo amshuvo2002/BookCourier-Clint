@@ -13,11 +13,11 @@ const BookDetails = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [reviews, setReviews] = useState([]);
-  const [rating, setRating] = useState(5); // user rating input
+  const [rating, setRating] = useState(5); 
   const [comment, setComment] = useState("");
   const axiosSecure = UseAxious();
 
-  // Fetch book & reviews
+ 
   useEffect(() => {
     const fetchBook = async () => {
       try {
@@ -150,7 +150,7 @@ const BookDetails = () => {
         </div>
       </div>
 
-      {/* Reviews Section */}
+   
       <div className="mt-10">
         <h3 className="text-2xl font-bold mb-4">Reviews</h3>
 
@@ -168,7 +168,6 @@ const BookDetails = () => {
           </div>
         )}
 
-        {/* Add Review Form */}
         <div className="mt-6 border-t pt-4">
           <h4 className="font-semibold mb-2">Add Your Review</h4>
           <select

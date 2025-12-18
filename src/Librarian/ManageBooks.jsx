@@ -6,14 +6,14 @@ export default function MyBooks() {
   const axiosSecure = UseAxious();
   const [books, setBooks] = useState([]);
 
-  // ---------------- Load Books ----------------
+
   useEffect(() => {
     axiosSecure.get("/books").then(res => {
       setBooks(res.data);
     });
   }, []);
 
-  // ---------------- Publish / Unpublish ----------------
+
   const toggleStatus = async (id, currentStatus) => {
     const newStatus =
       currentStatus === "published" ? "unpublished" : "published";
@@ -33,9 +33,9 @@ export default function MyBooks() {
     }
   };
 
-  // ---------------- Edit ----------------
+
   const handleEdit = (book) => {
-    // future: navigate or open modal
+
     Swal.fire("Edit Clicked", `Edit "${book.title}"`, "info");
   };
 
@@ -76,7 +76,7 @@ export default function MyBooks() {
                 </td>
 
                 <td className="px-4 py-3 text-center space-x-2">
-                  {/* Edit */}
+               
                   <button
                     onClick={() => handleEdit(book)}
                     className="px-3 py-1 text-sm rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
@@ -84,7 +84,7 @@ export default function MyBooks() {
                     Edit
                   </button>
 
-                  {/* Publish / Unpublish */}
+              
                   <button
                     onClick={() => toggleStatus(book._id, book.status)}
                     className={`px-3 py-1 text-sm rounded-md

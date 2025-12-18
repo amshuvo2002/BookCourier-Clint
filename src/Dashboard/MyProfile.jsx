@@ -30,7 +30,7 @@ const Profile = () => {
     try {
       let photoURL = photoPreview;
       if (photoFile) {
-        // browser local URL (Firebase storage optional)
+        
         photoURL = URL.createObjectURL(photoFile);
       }
 
@@ -45,7 +45,6 @@ const Profile = () => {
         text: "Your name and photo have been updated.",
       });
 
-      // optional: refresh page or state
       window.location.reload();
 
     } catch (err) {

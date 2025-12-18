@@ -47,9 +47,9 @@ import MyWishlist from "./Dashboard/MyWishlist.jsx";
 
 
 const router = createBrowserRouter([
-  // ====================
+ 
   // MAIN LAYOUT
-  // ====================
+
   {
     path: "/",
     element: <MainLayout />,
@@ -78,9 +78,9 @@ const router = createBrowserRouter([
     ],
   },
 
-  // ====================
+  
   // DASHBOARD LAYOUT
-  // ====================
+
   {
     path: "/dashboard",
     element: (
@@ -89,9 +89,9 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
-      // ====================
+     
       // USER DEFAULT DASHBOARD
-      // ====================
+    
       {
         path: "user",
         element: <UserDashboard></UserDashboard>,
@@ -106,9 +106,9 @@ const router = createBrowserRouter([
 
     
 
-      // ====================
+     
       // LIBRARIAN ROUTES
-      // ====================
+   
       {
         path: "librarian",
         element: <LibrarianDashboard />,
@@ -120,9 +120,9 @@ const router = createBrowserRouter([
         ],
       },
 
-      // ====================
+     
       // ADMIN ROUTES
-      // ====================
+    
       {
         path: "admin",
         element: <AdminDashboard />,

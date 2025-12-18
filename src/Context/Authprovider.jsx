@@ -13,11 +13,9 @@ import {
 
 const Authprovider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // track loading
+  const [loading, setLoading] = useState(true); 
 
-  // -----------------------------
-  // Register with Email + Password + Photo File
-  // -----------------------------
+
   const register = async (email, password, name, photoFile) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -30,14 +28,10 @@ const Authprovider = ({ children }) => {
     return userCredential;
   };
 
-  // -----------------------------
-  // Login with Email + Password
-  // -----------------------------
+
   const login = (email, password) => signInWithEmailAndPassword(auth, email, password);
 
-  // -----------------------------
-  // Google Login
-  // -----------------------------
+
   const googleLogin = async () => {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
@@ -45,17 +39,13 @@ const Authprovider = ({ children }) => {
     return result;
   };
 
-  // -----------------------------
-  // Logout
-  // -----------------------------
+ 
   const logout = async () => {
     await signOut(auth);
     setUser(null);
   };
 
-  // -----------------------------
-  // Listen to auth state changes
-  // -----------------------------
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);

@@ -9,9 +9,7 @@ export default function Invoices() {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ===============================
-  // Fetch invoices
-  // ===============================
+
   useEffect(() => {
     if (!user?.email) return;
 
@@ -52,9 +50,7 @@ export default function Invoices() {
     fetchInvoices();
   }, [user, axiosSecure]);
 
-  // ===============================
-  // Delete invoice
-  // ===============================
+ 
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -83,7 +79,7 @@ export default function Invoices() {
     <div className="text-black max-w-6xl mx-auto py-10 px-4">
       <h1 className="text-2xl font-bold mb-6">Invoices</h1>
 
-      {/* Desktop Table */}
+   
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full border text-left min-w-[600px]">
           <thead>
@@ -140,7 +136,7 @@ export default function Invoices() {
         </table>
       </div>
 
-      {/* Mobile Accordion */}
+      
       <div className="md:hidden space-y-4">
         {invoices.length === 0 && <p className="text-center py-4">No invoices found.</p>}
 

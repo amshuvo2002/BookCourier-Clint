@@ -13,7 +13,7 @@ const MyDashboard = () => {
   const axiosSecure = UseAxious();
   const navigate = useNavigate();
 
-  // Fetch role
+
   useEffect(() => {
     const fetchRole = async () => {
       if (user?.email) {
@@ -60,12 +60,12 @@ const MyDashboard = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
+   
       <aside
         className={`bg-white border-r shadow-sm h-screen transition-all duration-300
         ${sidebarOpen ? "w-64" : "w-20"} overflow-y-auto`}
       >
-        {/* Sidebar header */}
+     
         <div className="flex items-center justify-between px-4 h-10 border-b">
           {sidebarOpen && <h2 className="text-lg font-bold text-gray-800">User Dashboard</h2>}
           <button
@@ -77,7 +77,7 @@ const MyDashboard = () => {
         </div>
 
      
-        {/* Links */}
+  
         <ul className="mt-4 space-y-1 px-2">
           {userLinks.map((link) => (
             <li key={link.name}>
@@ -100,7 +100,7 @@ const MyDashboard = () => {
         </ul>
       </aside>
 
-      {/* Main content */}
+      
       <main className="flex-1 md:p-6 p-2 overflow-auto">
         <Outlet />
       </main>

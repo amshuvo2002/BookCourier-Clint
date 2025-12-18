@@ -1,11 +1,37 @@
 import axios from 'axios';
-import React from 'react';
+import { getAuth } from "firebase/auth";
 
-const AxiousSecure = axios.create({
-    baseURL:"http://localhost:3000/"
-})
-const UseAxious = () => {
-    return AxiousSecure
+const axiosSecure = axios.create({
+  baseURL: "http://localhost:3000/",
+});
+
+axiosSecure.interceptors.request.use(async (config) => {
+  const auth = getAuth();
+  if (auth.currentUser) {
+    try {
+      const token = await auth.currentUser.getIdToken();
+      config.headers.Authorization = `Bearer ${token}`;
+    } catch (error) {
+      console.error("Token fetch error:", error);
+    }
+  }
+  return config;
+});
+
+
+axiosSecure.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
+const useAxiosSecure = () => {
+  return axiosSecure;
 };
 
-export default UseAxious;
+export default useAxiosSecure;

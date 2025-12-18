@@ -10,7 +10,7 @@ export default function ManageBooks() {
   const [books, setBooks] = useState([]);
   const [role, setRole] = useState("");
 
-  // Load role + books
+ 
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -27,7 +27,7 @@ export default function ManageBooks() {
   }, [user.email]);
 
 const handleDelete = async (id) => {
-  console.log("Deleting book id:", id); // <-- check what ID is being sent
+  console.log("Deleting book id:", id); 
 
   const confirm = await Swal.fire({
     title: "Are you sure?",
@@ -57,7 +57,6 @@ const handleDelete = async (id) => {
 };
 
 
-  // ---------------- Publish / Unpublish ----------------
   const toggleStatus = async (id, currentStatus) => {
     const newStatus = currentStatus === "published" ? "unpublished" : "published";
 

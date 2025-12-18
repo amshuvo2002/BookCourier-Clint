@@ -2,14 +2,14 @@ import React from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 
-// Marker icon fix
+
 const redIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
   iconSize: [30, 30],
   iconAnchor: [15, 30],
 });
 
-// সার্ভিস লোকেশন ডেটা (latitude, longitude)
+
 const serviceLocations = [
   { name: "Dhaka", lat: 23.8103, lng: 90.4125 },
   { name: "Chittagong", lat: 22.3569, lng: 91.7832 },
@@ -22,12 +22,12 @@ const serviceLocations = [
   { name: "Comilla", lat: 23.4600, lng: 91.1800 },
 ];
 
-// Component to fly map to a location
+
 const FlyMarker = ({ position, name }) => {
   const map = useMap();
 
   const handleClick = () => {
-    map.flyTo(position, 9, { duration: 1 }); // smooth fly to location
+    map.flyTo(position, 9, { duration: 1 }); 
   };
 
   return (

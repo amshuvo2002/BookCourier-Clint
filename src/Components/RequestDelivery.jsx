@@ -27,7 +27,7 @@ const RequestDelivery = () => {
             phone: form.phone.value,
             address: form.address.value,
             bookTitle: form.bookName.value,
-            price: parseFloat(form.price.value), // added price
+            price: parseFloat(form.price.value),
             orderDate: new Date(),
             status: "pending",
             paymentStatus: "unpaid",
@@ -36,7 +36,7 @@ const RequestDelivery = () => {
         try {
             const { data } = await axiosSecure.post("/orders", orderData);
 
-            if (data?.orderId || data?.insertedId) { // backend অনুযায়ী
+            if (data?.orderId || data?.insertedId) { 
                 Swal.fire("Success!", "Your delivery request has been placed!", "success");
                 form.reset();
             } else {

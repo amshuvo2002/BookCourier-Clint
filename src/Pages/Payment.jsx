@@ -11,9 +11,7 @@ export default function PaymentPage() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ===============================
-  // Fetch order
-  // ===============================
+
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -21,7 +19,7 @@ export default function PaymentPage() {
           `/orders/payment/${id}`
         );
 
-        // fallback price
+       
         if ((!data.price || data.price === "N/A") && data.bookId) {
           const bookRes = await axiosSecure.get(
             `/books/${data.bookId}`
@@ -41,9 +39,7 @@ export default function PaymentPage() {
     fetchOrder();
   }, [id, axiosSecure]);
 
-  // ===============================
-  // Handle Payment
-  // ===============================
+
   const handlePayment = async () => {
     const confirm = await Swal.fire({
       title: "Confirm Payment?",

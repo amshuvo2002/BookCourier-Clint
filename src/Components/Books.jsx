@@ -7,14 +7,14 @@ const Books = () => {
   const [filteredBooks, setFilteredBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc"); // asc / desc
-  const axiosSecure = UseAxious(); // axios instance
+  const [sortOrder, setSortOrder] = useState("asc"); 
+  const axiosSecure = UseAxious(); 
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
         const res = await axiosSecure.get("/books");
-        // শুধুমাত্র published books রাখছি
+ 
         const publishedBooks = res.data.filter(book => book.status === "published");
         setBooks(publishedBooks);
         setFilteredBooks(publishedBooks);
@@ -27,7 +27,7 @@ const Books = () => {
     fetchBooks();
   }, [axiosSecure]);
 
-  // Search & Sort functionality
+
   useEffect(() => {
     let tempBooks = [...books];
     if (search) {
@@ -50,7 +50,7 @@ const Books = () => {
     <div className="max-w-6xl mx-auto py-10 px-4">
       <h2 className="text-3xl font-bold text-center mb-6">Books Collection</h2>
 
-      {/* Search & Sort Controls */}
+   
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <input
           type="text"

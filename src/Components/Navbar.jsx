@@ -4,19 +4,30 @@ import logo from "../assets/vecteezy_delivery-and-courier-motorbike-logo-icon_48
 import { Link } from "react-router";
 import { Authcontext } from "../Context/Authcontext";
 import axios from "axios";
+import { getAuth } from "firebase/auth";
 
 const Navbar = () => {
   const { user, logout, loading: authLoading } = useContext(Authcontext);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch role
+ 
   useEffect(() => {
     const fetchRole = async () => {
       if (user?.email) {
         try {
+          const auth = getAuth();
+          const currentUser = auth.currentUser;
+          let token = null;
+          if (currentUser) {
+            token = await currentUser.getIdToken();
+          }
+
           const res = await axios.get(
-            `http://localhost:3000/api/getRole?email=${user.email}`
+            `http://localhost:3000/api/getRole?email=${user.email}`,
+            {
+              headers: token ? { Authorization: `Bearer ${token}` } : {},
+            }
           );
           setRole(res.data.role || null);
         } catch (err) {
@@ -42,7 +53,7 @@ const Navbar = () => {
     );
   }
 
-  // Dashboard link by role
+
   let dashboardLink = "";
   if (role === "admin") dashboardLink = "/dashboard/admin/users";
   else if (role === "librarian") dashboardLink = "/dashboard/librarian/manage-books";
@@ -50,7 +61,7 @@ const Navbar = () => {
 
   return (
     <div className="navbar bg-gray-300 text-black shadow-sm">
-      {/* Navbar Start */}
+     
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -65,12 +76,12 @@ const Navbar = () => {
             </svg>
           </div>
 
-          {/* Mobile Menu */}
+        
           <ul className="menu menu-sm dropdown-content bg-white bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
             <Link to="/"><h1 className="hover:underline">Home</h1></Link>
             <Link to="/books"><h1 className="hover:underline">Books</h1></Link>
 
-            {/* USER ONLY */}
+          
             {role === "user" && (
               <Link to="/request-delivery">
                 <h1 className="hover:underline">Request Delivery</h1>
@@ -91,7 +102,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Navbar Center (Desktop) */}
+      
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 gap-4">
           <Link to="/"><h1 className="hover:underline">Home</h1></Link>
@@ -112,10 +123,10 @@ const Navbar = () => {
         </ul>
       </div>
 
-      {/* Theme */}
+
       <div><ThemeToggle /></div>
 
-      {/* Navbar End */}
+     
       <div className="navbar-end">
         {user?.uid ? (
           <div className="dropdown dropdown-end">

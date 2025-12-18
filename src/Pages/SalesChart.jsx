@@ -10,19 +10,18 @@ export default function OrdersChart() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axiosSecure.get("/orders"); // সব orders
+        const res = await axiosSecure.get("/orders"); 
         const orders = res.data;
 
-        // মাস অনুযায়ী group করা
+     
         const monthlyOrders = {};
 
         orders.forEach(order => {
           const date = new Date(order.orderDate || order.createdAt);
-          const month = date.toLocaleString("default", { month: "short" }); // Jan, Feb, ...
-          monthlyOrders[month] = (monthlyOrders[month] || 0) + 1;
+          const month = date.toLocaleString("default", { month: "short" }); 
         });
 
-        // chart data বানানো
+       
         const chartData = Object.keys(monthlyOrders).map(month => ({
           name: month,
           orders: monthlyOrders[month],

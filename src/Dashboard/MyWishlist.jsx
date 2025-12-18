@@ -2,16 +2,16 @@ import { useEffect, useState, useContext } from "react";
 import { Authcontext } from "../Context/Authcontext";
 import UseAxious from "../Hooks/UseAxious";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router"; // <-- import useNavigate
+import { useNavigate } from "react-router";
 
 export default function MyWishlist() {
   const axiosSecure = UseAxious();
   const { user } = useContext(Authcontext);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); // <-- hook
+  const navigate = useNavigate(); 
 
-  // Fetch wishlist
+ 
   useEffect(() => {
     if (!user) return;
     axiosSecure
@@ -26,7 +26,7 @@ export default function MyWishlist() {
       });
   }, [user]);
 
-  // Remove from wishlist
+
   const removeFromWishlist = async (id) => {
     try {
       await axiosSecure.delete(`/wishlist/${id}`);

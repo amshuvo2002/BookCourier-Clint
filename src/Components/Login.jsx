@@ -7,7 +7,7 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../Firebase/Firebase.init";
 import { FcGoogle } from "react-icons/fc";
 
-// ⭐ MongoDB Axios Secure Hook
+
 import UseAxious from "../Hooks/UseAxious";
 const axiosSecure = UseAxious();
 
@@ -21,15 +21,13 @@ export default function Login() {
 
   const googleProvider = new GoogleAuthProvider();
 
-  // -------------------------------------------------------
-  // ⭐ GOOGLE LOGIN + MongoDB user save + role redirect
-  // -------------------------------------------------------
+ 
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
-      // ⭐ Check & Save user to MongoDB
+     
       await axiosSecure.post("/users", {
         name: user.displayName,
         email: user.email,
@@ -37,7 +35,7 @@ export default function Login() {
         photoURL: user.photoURL,
       });
 
-      // ⭐ Fetch role from backend
+     
       const roleRes = await axiosSecure.get(`/api/getRole?email=${user.email}`);
       const role = roleRes.data.role;
 
@@ -49,7 +47,7 @@ export default function Login() {
         showConfirmButton: false,
       });
 
-      // ⭐ Redirect based on role
+  
       if (role === "admin") navigate("/dashboard/admin/users", { replace: true });
       else if (role === "librarian") navigate("/dashboard/librarian/dashboard", { replace: true });
       else navigate("/dashboard/profile", { replace: true });
@@ -63,9 +61,7 @@ export default function Login() {
     }
   };
 
-  // -------------------------------------------------------
-  // ⭐ EMAIL/PASSWORD LOGIN + MongoDB check + role redirect
-  // -------------------------------------------------------
+
   const handleLogin = async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
@@ -75,7 +71,6 @@ export default function Login() {
       const result = await signIn(email, password);
       const user = result.user;
 
-      // Ensure user exists in MongoDB
       await axiosSecure.post("/users", {
         name: user.displayName || "",
         email: user.email,
@@ -83,7 +78,7 @@ export default function Login() {
         photoURL: user.photoURL || "",
       });
 
-      // ⭐ Fetch role from backend
+   
       const roleRes = await axiosSecure.get(`/api/getRole?email=${user.email}`);
       const role = roleRes.data.role;
 
@@ -95,7 +90,7 @@ export default function Login() {
         showConfirmButton: false,
       });
 
-      // ⭐ Redirect based on role
+    
       if (role === "admin") navigate("/dashboard/admin/users", { replace: true });
       else if (role === "librarian") navigate("/dashboard/librarian/dashboard", { replace: true });
       else navigate("/", { replace: true });
@@ -109,9 +104,7 @@ export default function Login() {
     }
   };
 
-  // -------------------------------------------------------
-  // ⭐ UI SECTION (NO CHANGE)
-  // -------------------------------------------------------
+
   return (
     <div className="w-full max-w-sm mx-auto border mb-10 p-6 mt-10 rounded-xl">
       <h2 className="text-xl font-bold mb-4 text-center">Login</h2>

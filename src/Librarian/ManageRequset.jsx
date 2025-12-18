@@ -16,16 +16,14 @@ const OrdersPage = () => {
     return order.orderStatus;
   };
 
-  // ============================
-  // Fetch Role
-  // ============================
+
   useEffect(() => {
     if (!user?.email) return;
 
     const fetchRole = async () => {
       try {
         const res = await axiosSecure.get(`/api/getRole?email=${user.email}`, {
-          cache: "no-cache", // Axios v1+ supports this
+          cache: "no-cache",
           headers: {
             "Cache-Control": "no-cache, no-store, must-revalidate",
             Pragma: "no-cache",
@@ -41,9 +39,7 @@ const OrdersPage = () => {
     fetchRole();
   }, [user?.email, axiosSecure]);
 
-  // ============================
-  // Fetch Orders - with cache busting
-  // ============================
+
   const fetchOrders = useCallback(async () => {
     if (!user?.email || !role) return;
 
@@ -60,7 +56,7 @@ const OrdersPage = () => {
           Pragma: "no-cache",
           Expires: "0",
         },
-        params: { t: Date.now() }, // Cache buster query param
+        params: { t: Date.now() },
       });
 
       setOrders(res.data || []);
@@ -73,23 +69,20 @@ const OrdersPage = () => {
     }
   }, [role, user?.email, axiosSecure]);
 
-  // Fetch when role is ready
+
   useEffect(() => {
     if (role) {
       fetchOrders();
     }
   }, [role, fetchOrders]);
 
-  // ============================
-  // Update Status
-  // ============================
+
   const updateOrderStatus = async (id, newStatus) => {
     try {
       await axiosSecure.patch(`/orders/${id}/status`, { status: newStatus });
 
       Swal.fire("Success!", `Order status updated to ${newStatus}`, "success");
 
-      // Refetch to get fresh data from server
       fetchOrders();
     } catch (err) {
       console.error("Update failed:", err);
@@ -97,7 +90,7 @@ const OrdersPage = () => {
     }
   };
 
-  // Cancel order
+
   const cancelOrder = async (id) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -112,7 +105,7 @@ const OrdersPage = () => {
     await updateOrderStatus(id, "cancelled");
   };
 
-  // Next Status
+
   const nextStatus = (order) => {
     if (order.orderStatus === "pending") {
       updateOrderStatus(order._id, "shipped");
@@ -121,7 +114,7 @@ const OrdersPage = () => {
     }
   };
 
-  // Delete Order
+ 
   const deleteOrder = async (id) => {
     const result = await Swal.fire({
       title: "Delete permanently?",
@@ -136,7 +129,7 @@ const OrdersPage = () => {
     try {
       await axiosSecure.delete(`/orders/${id}`);
       Swal.fire("Deleted!", "Order has been removed", "success");
-      fetchOrders(); // Refresh list
+      fetchOrders(); 
     } catch (err) {
       console.error(err);
       Swal.fire("Error!", "Could not delete order", "error");
@@ -194,7 +187,7 @@ const OrdersPage = () => {
                       </span>
                     </td>
                     <td className="py-2 px-4 space-x-2">
-                      {/* Next Status - Only for librarian & paid orders */}
+                    
                       {role === "librarian" &&
                         order.paymentStatus === "paid" &&
                         ["pending", "shipped"].includes(order.orderStatus) && (
@@ -206,7 +199,7 @@ const OrdersPage = () => {
                           </button>
                         )}
 
-                      {/* Cancel Button */}
+                    
                       {(role === "librarian" || order.userEmail === user?.email) &&
                         order.orderStatus !== "cancelled" &&
                         order.orderStatus !== "delivered" && (
@@ -218,7 +211,7 @@ const OrdersPage = () => {
                           </button>
                         )}
 
-                      {/* Delete - Only librarian */}
+                     
                       {role === "librarian" && (
                         <button
                           onClick={() => deleteOrder(order._id)}

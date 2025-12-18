@@ -19,12 +19,12 @@ export default function Sidebar() {
   return (
     <div className="flex flex-col min-h-screen w-full">
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
+     
         <aside
           className={`bg-white border-r shadow-sm transition-all duration-300
             ${sidebarOpen ? "w-64" : "w-20"} h-full overflow-y-auto`}
         >
-          {/* Header */}
+          
           <div className="flex items-center justify-between px-4 h-16 border-b">
             {sidebarOpen && (
               <h2 className="text-lg font-bold text-gray-800">
@@ -39,7 +39,7 @@ export default function Sidebar() {
             </button>
           </div>
 
-          {/* Links */}
+      
           <ul className="mt-4 space-y-1 px-2">
             {links.map((link) => (
               <li key={link.name}>
@@ -62,7 +62,7 @@ export default function Sidebar() {
           </ul>
         </aside>
 
-        {/* Main Content */}
+      
         <main className="flex-1 overflow-auto p-4 bg-gray-100">
           <Outlet />
         </main>

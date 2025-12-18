@@ -49,7 +49,7 @@ export default function MyOrders() {
     fetchOrders();
   }, [user, axiosSecure]);
 
-  // Cancel order
+
   const handleCancel = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -76,7 +76,7 @@ export default function MyOrders() {
     }
   };
 
-  // Delete order
+  
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -125,7 +125,7 @@ export default function MyOrders() {
     <div className="text-black px-2 md:px-0">
       <h1 className="text-xl font-bold mb-4">My Orders</h1>
 
-      {/* এই div টা মোবাইলে সুন্দর স্ক্রলবার দেবে */}
+      
       <div className="overflow-x-auto -mx-4 px-4">
         <div className="inline-block min-w-full align-middle">
           <table className="min-w-full min-w-[700px] border-collapse bg-white">

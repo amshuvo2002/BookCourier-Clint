@@ -6,9 +6,7 @@ const AdminUsers = () => {
     const axiosSecure = UseAxious();
     const [users, setUsers] = useState([]);
 
-    // -----------------------------
-    // Load all users from MongoDB
-    // -----------------------------
+  
     const fetchUsers = async () => {
         try {
             const res = await axiosSecure.get("/users");
@@ -22,9 +20,7 @@ const AdminUsers = () => {
         fetchUsers();
     }, []);
 
-    // -----------------------------
-    // Handle Role Change
-    // -----------------------------
+ 
     const handleRoleChange = async (email, newRole) => {
         try {
             const res = await axiosSecure.put(`/users/role/${email}`, { role: newRole });
@@ -42,9 +38,7 @@ const AdminUsers = () => {
         }
     };
 
-    // -----------------------------
-    // Handle Delete User
-    // -----------------------------
+  
     const handleDeleteUser = async (email) => {
         Swal.fire({
             title: `Are you sure you want to delete ${email}?`,
@@ -72,16 +66,12 @@ const AdminUsers = () => {
         <div className="p-4 sm:p-6 text-black">
             <h2 className="text-2xl sm:text-3xl font-semibold mb-6">👥 All Users</h2>
 
-            {/* Table Wrapper */}
+        
             <div className="shadow rounded-lg bg-white">
 
-                {/* Horizontal scroll for small device */}
                 <div className="overflow-x-auto">
 
-                    {/* 
-                        Vertical scroll ONLY for small device
-                        Desktop এ scrollbar থাকবে না
-                    */}
+                  
                     <div className="max-h-[60vh] overflow-y-auto sm:max-h-none sm:overflow-visible">
                         <div className="min-w-[700px]">
                             <table className="table w-full border-collapse">

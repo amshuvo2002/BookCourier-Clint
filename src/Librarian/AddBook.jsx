@@ -9,7 +9,7 @@ export default function AddBook() {
     author: "",
     price: "",
     stock: "",
-    photoURL: "" // ✅ added
+    photoURL: "" 
   });
 
   const handleSubmit = async (e) => {
@@ -26,7 +26,7 @@ export default function AddBook() {
           confirmButtonColor: "#2563eb",
         });
 
-        // optional: form reset
+       
         setInfo({ title: "", author: "", price: "", stock: "", photoURL: "" });
       }
     } catch (error) {

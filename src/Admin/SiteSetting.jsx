@@ -9,7 +9,7 @@ const SiteSettings = () => {
     });
     const [loading, setLoading] = useState(false);
 
-    // Load settings from server
+
     useEffect(() => {
         fetch("http://localhost:5000/settings")
             .then(res => res.json())
@@ -47,7 +47,7 @@ const SiteSettings = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4 text-black">
 
-                {/* Logo URL */}
+               
                 <div>
                     <label className="font-medium">Logo URL</label>
                     <input
@@ -60,7 +60,7 @@ const SiteSettings = () => {
                     />
                 </div>
 
-                {/* Banner Text */}
+            
                 <div>
                     <label className="font-medium">Banner Text</label>
                     <input
@@ -73,7 +73,7 @@ const SiteSettings = () => {
                     />
                 </div>
 
-                {/* Footer Text */}
+             
                 <div>
                     <label className="font-medium">Footer Text</label>
                     <input

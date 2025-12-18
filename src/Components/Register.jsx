@@ -9,11 +9,9 @@ const axiosSecure = UseAxious();
 export default function Register() {
   const [showPass, setShowPass] = useState(false);
   const navigate = useNavigate();
-  const { register } = useContext(Authcontext); // Firebase register function
+  const { register } = useContext(Authcontext); 
 
-  // -----------------------------
-  // Handle Registration
-  // -----------------------------
+ 
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -22,7 +20,7 @@ export default function Register() {
     const password = e.target.password.value;
     const imageFile = e.target.image.files[0];
 
-    // Password validation
+ 
     const passRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
     if (!passRegex.test(password)) {
       return Swal.fire({
@@ -33,20 +31,13 @@ export default function Register() {
     }
 
     try {
-      // -----------------------------
-      // 1️⃣ Firebase Register
-      // -----------------------------
+     
       const userCredential = await register(email, password, name, imageFile);
       const user = userCredential.user;
 
-      // -----------------------------
-      // 2️⃣ Prepare Photo URL (local preview)
-      // -----------------------------
+     
       const photoURL = imageFile ? URL.createObjectURL(imageFile) : "";
 
-      // -----------------------------
-      // 3️⃣ Save user to MongoDB
-      // -----------------------------
       await axiosSecure.post("/users", {
         name,
         email,
@@ -54,9 +45,7 @@ export default function Register() {
         photoURL,
       });
 
-      // -----------------------------
-      // 4️⃣ Success Alert
-      // -----------------------------
+   
       await Swal.fire({
         icon: "success",
         title: "Registration Successful!",
@@ -65,9 +54,7 @@ export default function Register() {
         showConfirmButton: false,
       });
 
-      // -----------------------------
-      // 5️⃣ Redirect to Home
-      // -----------------------------
+
       navigate("/");
 
     } catch (err) {
@@ -79,15 +66,13 @@ export default function Register() {
     }
   };
 
-  // -----------------------------
-  // UI
-  // -----------------------------
+
   return (
     <div className="w-full max-w-sm mx-auto border mb-10 p-6 mt-10 rounded-xl shadow-lg">
       <h2 className="text-2xl font-bold mb-6 text-center text-primary">Register</h2>
 
       <form onSubmit={handleRegister}>
-        {/* Name */}
+  
         <input
           type="text"
           name="name"
@@ -96,7 +81,7 @@ export default function Register() {
           required
         />
 
-        {/* Photo Upload */}
+     
         <input
           type="file"
           name="image"
@@ -104,7 +89,7 @@ export default function Register() {
           className="file-input file-input-bordered w-full mb-3"
         />
 
-        {/* Email */}
+     
         <input
           type="email"
           name="email"
@@ -113,7 +98,7 @@ export default function Register() {
           required
         />
 
-        {/* Password */}
+  
         <div className="relative mb-4">
           <input
             type={showPass ? "text" : "password"}
@@ -130,12 +115,12 @@ export default function Register() {
           </span>
         </div>
 
-        {/* Register Button */}
+     
         <button type="submit" className="btn btn-primary w-full mb-3">
           Register
         </button>
 
-        {/* Login Link */}
+      
         <p className="text-center mt-4 text-sm">
           Already have an account?{" "}
           <Link to="/login" className="text-blue-600 font-semibold">

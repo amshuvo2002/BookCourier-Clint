@@ -7,7 +7,7 @@ export default function AdminRequestDelivery() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all delivery requests
+
   const fetchRequests = async () => {
     try {
       const res = await axiosSecure.get("/delivery-requests");
@@ -24,7 +24,6 @@ export default function AdminRequestDelivery() {
     fetchRequests();
   }, []);
 
-  // ---------------- Update Status ----------------
   const handleUpdateStatus = async (id, status) => {
     const confirmText = status === "approved" ? "approve" : "reject";
     const result = await Swal.fire({
@@ -58,7 +57,7 @@ export default function AdminRequestDelivery() {
     }
   };
 
-  // ---------------- DELETE Request ----------------
+
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
       title: "Delete Request?",
@@ -90,7 +89,7 @@ export default function AdminRequestDelivery() {
     <div className="p-6 text-black">
       <h2 className="text-2xl font-bold mb-5">📦 Admin Delivery Requests</h2>
 
-      {/* Scrollable table */}
+  
       <div className="overflow-x-auto max-h-[500px] overflow-y-auto border rounded">
         <table className="table w-full border-collapse border border-gray-200">
           <thead className="bg-gray-100 text-black sticky top-0">

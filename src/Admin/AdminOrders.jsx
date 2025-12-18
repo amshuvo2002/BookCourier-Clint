@@ -1,4 +1,4 @@
-// src/components/AdminOrders.jsx
+
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import UseAxious from "../hooks/UseAxious";
@@ -9,7 +9,7 @@ const AdminOrders = () => {
 
   const axiosSecure = UseAxious();
 
-  // ---------------- Load all orders ----------------
+
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -27,7 +27,7 @@ const AdminOrders = () => {
     fetchOrders();
   }, []);
 
-  // ---------------- Update Order Status ----------------
+
   const handleStatusUpdate = async (id, currentStatus) => {
     let nextStatus;
     if (currentStatus === "pending") nextStatus = "shipped";
@@ -53,7 +53,7 @@ const AdminOrders = () => {
     }
   };
 
-  // ---------------- Cancel Order ----------------
+
   const handleCancel = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -83,7 +83,7 @@ const AdminOrders = () => {
     }
   };
 
-  // ---------------- DELETE Order ----------------
+
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
       title: "Delete Order?",
@@ -103,7 +103,7 @@ const AdminOrders = () => {
       if (res.data.deletedCount > 0) {
         Swal.fire("Deleted!", "Order deleted successfully", "success");
 
-        // ❌ UI থেকেও remove
+    
         setOrders(prev => prev.filter(order => order._id !== id));
       }
     } catch (err) {
@@ -212,7 +212,7 @@ const AdminOrders = () => {
                         </button>
                       )}
 
-                      {/* DELETE */}
+                     
                       <button
                         onClick={() => handleDelete(_id)}
                         className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"

@@ -11,7 +11,7 @@ export default function AddBook() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Book Added:", book); // API POST এখানে করবেন
+    console.log("Book Added:", book); 
   };
 
   return (
