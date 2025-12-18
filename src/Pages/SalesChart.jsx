@@ -13,15 +13,16 @@ export default function OrdersChart() {
         const res = await axiosSecure.get("/orders"); 
         const orders = res.data;
 
-     
+       
         const monthlyOrders = {};
 
         orders.forEach(order => {
           const date = new Date(order.orderDate || order.createdAt);
           const month = date.toLocaleString("default", { month: "short" }); 
+          monthlyOrders[month] = (monthlyOrders[month] || 0) + 1;
         });
 
-       
+ 
         const chartData = Object.keys(monthlyOrders).map(month => ({
           name: month,
           orders: monthlyOrders[month],

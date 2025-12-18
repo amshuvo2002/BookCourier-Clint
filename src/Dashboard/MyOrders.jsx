@@ -63,9 +63,9 @@ export default function MyOrders() {
     if (!confirm.isConfirmed) return;
 
     try {
-      const { data } = await axiosSecure.patch(`/orders/${id}/status`, { status: "cancelled" });
-      if (data.modifiedCount > 0) {
-        setOrders((prev) => prev.map(o => o._id === id ? { ...o, status: "cancelled" } : o));
+      const { data } = await axiosSecure.patch(`/orders/cancel/${id}`);
+      if (data.success) {
+        setOrders((prev) => prev.map(o => o._id === id ? { ...o, orderStatus: "cancelled" } : o));
         Swal.fire("Cancelled", "Your order has been cancelled!", "success");
       } else {
         Swal.fire("Error", "Failed to cancel order!", "error");
@@ -149,7 +149,7 @@ export default function MyOrders() {
               )}
               {orders.map((o) => {
                 const isPaid = o.paymentStatus === "paid" || o.status === "paid";
-                const isCancelled = o.status === "cancelled";
+                const isCancelled = o.orderStatus === "cancelled";
 
                 const price = o.price ?? "N/A";
                 const orderDate = o.orderDate ?? o.createdAt ?? null;
