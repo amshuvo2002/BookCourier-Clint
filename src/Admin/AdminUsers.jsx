@@ -5,14 +5,18 @@ import UseAxious from "../Hooks/UseAxious";
 const AdminUsers = () => {
     const axiosSecure = UseAxious();
     const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true); 
 
-  
     const fetchUsers = async () => {
         try {
+            setLoading(true);
             const res = await axiosSecure.get("/users");
             setUsers(res.data);
         } catch (err) {
             console.error(err);
+            Swal.fire("Error!", "Failed to load users", "error");
+        } finally {
+            setLoading(false); 
         }
     };
 
@@ -20,13 +24,13 @@ const AdminUsers = () => {
         fetchUsers();
     }, []);
 
- 
     const handleRoleChange = async (email, newRole) => {
         try {
             const res = await axiosSecure.put(`/users/role/${email}`, { role: newRole });
             if (res.data.modifiedCount > 0) {
                 Swal.fire("Success!", `User role changed to ${newRole}`, "success");
 
+          
                 const updatedUsers = users.map(user =>
                     user.email === email ? { ...user, role: newRole } : user
                 );
@@ -38,7 +42,6 @@ const AdminUsers = () => {
         }
     };
 
-  
     const handleDeleteUser = async (email) => {
         Swal.fire({
             title: `Are you sure you want to delete ${email}?`,
@@ -66,12 +69,8 @@ const AdminUsers = () => {
         <div className="p-4 sm:p-6 text-black">
             <h2 className="text-2xl sm:text-3xl font-semibold mb-6">👥 All Users</h2>
 
-        
             <div className="shadow rounded-lg bg-white">
-
                 <div className="overflow-x-auto">
-
-                  
                     <div className="max-h-[60vh] overflow-y-auto sm:max-h-none sm:overflow-visible">
                         <div className="min-w-[700px]">
                             <table className="table w-full border-collapse">
@@ -86,7 +85,13 @@ const AdminUsers = () => {
                                 </thead>
 
                                 <tbody>
-                                    {users.length > 0 ? (
+                                    {loading ? (
+                                        <tr>
+                                            <td colSpan="5" className="text-center py-10">
+                                                <span className="loading loading-spinner loading-lg"></span>
+                                            </td>
+                                        </tr>
+                                    ) : users.length > 0 ? (
                                         users.map((user, index) => (
                                             <tr key={user._id} className="border-b hover:bg-gray-50">
                                                 <td className="px-4 py-4 text-sm border">{index + 1}</td>
@@ -154,7 +159,6 @@ const AdminUsers = () => {
                             </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
